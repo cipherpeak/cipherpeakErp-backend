@@ -1,0 +1,72 @@
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    container_name: cipherERP_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    ports:
+      # - "5432:5432"
+        - "5434:5432"
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - cipherERP_network
+
+  # Django Web Application
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped  
+    container_name: cipherERP_web
+    command: gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3
+    volumes:
+      - .:/app
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media  
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - cipherERP_network
+
+
+  nginx:
+    image: nginx:alpine
+    container_name: cipherERP_nginx
+    ports:
+      - "8000:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - static_volume:/app/staticfiles:ro
+      - media_volume:/app/media:ro
+    depends_on:
+      - web
+    networks:
+      - cipherERP_network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    name: cipherERP_postgres_data
+  static_volume:
+    name: cipherERP_static
+  media_volume:
+    name: cipherERP_media
+
+networks:
+  cipherERP_network:
+    name: cipherERP_network
+    driver: bridge

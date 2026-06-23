@@ -1,0 +1,777 @@
+from datetime import datetime
+from django.utils import timezone
+from rest_framework import serializers
+from apps.authapp.models import Employee
+from .models import Document, VehicleIssue, VisaDetails, Vehicle, DailyOdometerReading, TemporaryVehicleImage, VehicleIssueImage
+import pytz
+
+class EmployeeProfileSerializer(serializers.ModelSerializer):
+    profile_pic = serializers.SerializerMethodField()
+    employee_type = serializers.CharField(source='get_employee_type_display')  
+
+    class Meta:
+        model = Employee
+        fields = [
+            'employeeId',
+            'employee_name', 
+            'profile_pic',
+            'employee_type',
+        ]
+
+    def get_profile_pic(self, obj):
+        if obj.profile_pic:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.profile_pic.url)
+            return obj.profile_pic.url
+        return None
+
+    
+
+
+class EmployeeInformationSerializer(serializers.ModelSerializer):
+    full_name = serializers.CharField(source='employee_name')
+    employee_id = serializers.CharField(source='employeeId')
+    employee_type = serializers.CharField(source='get_employee_type_display')  
+    company_name = serializers.SerializerMethodField()
+    company_location = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Employee
+        fields = [
+            'full_name',
+            'employee_id', 
+            'employee_type',
+            'company_name',
+            'date_joined',
+            'company_location',
+        ]   
+
+    def get_company_name(self, obj):
+        if obj.company and obj.company.company_name:
+            return obj.company.company_name
+        return None  
+    
+    def get_company_location(self, obj):
+        if obj.company and obj.company.address:
+            return obj.company.address
+        return None     
+
+
+class EmployeePersonalInfoSerializer(serializers.ModelSerializer):
+    pro_pic = serializers.SerializerMethodField()
+    mob_number = serializers.CharField(source='mobile_number')
+    employee_home_address = serializers.CharField(source='home_address')
+    dob = serializers.DateField(source='date_of_birth')
+    emergency_contact_info = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Employee
+        fields = [
+            'pro_pic',
+            'mob_number',
+            'email',
+            'employee_home_address',
+            'dob',
+            'nationality',
+            'emergency_contact_info'
+        ]
+
+    def get_pro_pic(self, obj):
+        if obj.profile_pic:  
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.profile_pic.url)  
+            return obj.profile_pic.url  
+        return None
+
+    def get_emergency_contact_info(self, obj):
+        """Return emergency contact information as list"""
+        if obj.emergency_contact_name and obj.emergency_contact_number:
+            return [{
+                'emergency_contacts_full_name': obj.emergency_contact_name,
+                'mob_number': obj.emergency_contact_number,
+                'relation_with_employee': obj.emergency_contact_relation
+            }]
+        return []       
+
+
+
+class EmployeePersonalInfoUpdateSerializer(serializers.ModelSerializer):
+    mob_number = serializers.CharField(source='mobile_number', required=False, allow_blank=True)
+    employee_address = serializers.CharField(source='home_address', required=False, allow_blank=True)
+    emergency_contact_info = serializers.ListField(
+        child=serializers.DictField(),
+        required=False,
+        write_only=True
+    )
+    
+    emergency_contact_info_response = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = Employee
+        fields = [
+            'mob_number',
+            'email',
+            'employee_address',
+            'emergency_contact_info',
+            'emergency_contact_info_response',
+            'profile_pic'
+        ]
+
+    def update(self, instance, validated_data):
+        emergency_contact_info = validated_data.pop('emergency_contact_info', None)
+        
+        # Handle profile pic update
+        if 'profile_pic' in validated_data:
+            instance.profile_pic = validated_data.get('profile_pic')
+
+        instance = super().update(instance, validated_data)
+        
+        if emergency_contact_info and len(emergency_contact_info) > 0:
+            contact_data = emergency_contact_info[0]  
+            instance.emergency_contact_name = contact_data.get('emergency_contacts_full_name', instance.emergency_contact_name)
+            instance.emergency_contact_number = contact_data.get('mob_number', instance.emergency_contact_number)
+            instance.emergency_contact_relation = contact_data.get('relation_with_employee', instance.emergency_contact_relation)
+            instance.save()
+        
+        return instance
+
+    def to_internal_value(self, data):
+        if hasattr(data, 'dict'):
+            data = data.dict()
+        else:
+            data = data.copy()
+        
+        if 'emergency_contact_info' in data:
+            raw_value = data['emergency_contact_info']
+            if isinstance(raw_value, str):
+                import json
+                try:
+                    parsed_data = json.loads(raw_value)
+                    
+                    if isinstance(parsed_data, list) and len(parsed_data) > 0 and isinstance(parsed_data[0], list):
+                        print("DEBUG: Detected double nested list, flattening...")
+                        parsed_data = parsed_data[0]
+                        
+                    data['emergency_contact_info'] = parsed_data
+                    
+                except json.JSONDecodeError:
+                    raise serializers.ValidationError({
+                        'emergency_contact_info': 'Invalid JSON format.'
+                    })
+        
+        return super().to_internal_value(data)
+
+    def get_emergency_contact_info_response(self, obj):
+        """Return emergency contact information as list in response"""
+        if obj.emergency_contact_name and obj.emergency_contact_number:
+            return [{
+                'emergency_contacts_full_name': obj.emergency_contact_name,
+                'mob_number': obj.emergency_contact_number,
+                'relation_with_employee': obj.emergency_contact_relation
+            }]
+        return []
+    
+
+class DocumentSerializer(serializers.ModelSerializer):
+    document_name = serializers.CharField(source='get_document_type_display', read_only=True)
+
+    class Meta:
+        model = Document
+        fields = ['document_type', 'document_name', 'document_file', 'uploaded_at']
+
+
+class VisaDetailsSerializer(serializers.ModelSerializer):
+    documents = serializers.SerializerMethodField()
+    pending_documents_list = serializers.SerializerMethodField()
+
+    class Meta:
+        model = VisaDetails
+        fields = [
+            'visa_expiry_date',
+            'emirates_id_number',
+            'emirates_id_expiry',
+            'passport_number', 
+            'passport_expiry_date',
+            'documents',
+            'pending_documents_list'
+        ]
+
+    def get_documents(self, obj):
+        grouped_docs = {}
+        
+        # Group documents by document_type
+        for doc in obj.documents.all():
+            doc_type = doc.document_type
+            if doc_type not in grouped_docs:
+                grouped_docs[doc_type] = {
+                    'document_type': doc_type,
+                    'document_name': doc.get_document_type_display(),
+                    'document_file': [],
+                }
+            if doc.document_file:
+                # Add file URL to the array
+                request = self.context.get('request')
+                file_url = doc.document_file.url
+                if request:
+                    file_url = request.build_absolute_uri(file_url)
+                grouped_docs[doc_type]['document_file'].append(file_url)
+        
+        # Return as a list of dictionaries
+        return list(grouped_docs.values())
+
+    def get_pending_documents_list(self, obj):
+        """Get list of pending document names"""
+        return obj.get_pending_documents()
+
+
+class DocumentUpdateSerializer(serializers.Serializer):
+    document_type = serializers.ChoiceField(
+        choices=[
+            ('visa_copy', 'Visa Photo Copy'),
+            ('labour_card', 'Labour Card Copy'),
+            ('passport_copy', 'Passport Copy'),
+            ('emirates_id', 'Emirates ID Copy'),
+            ('work_permit', 'Work Permit Copy'),
+        ],
+        required=True
+    )
+    document_files = serializers.ListField(
+        child=serializers.FileField(),
+        required=True
+    )
+
+    def save(self, **kwargs):
+        visa_details = self.context['visa_details']
+        document_type = self.validated_data['document_type']
+        document_files = self.validated_data['document_files']
+        
+        # Delete existing documents of same type if exists
+        Document.objects.filter(
+            visa_details=visa_details, 
+            document_type=document_type
+        ).delete()
+        
+        # Create new documents
+        file_urls = []
+        for document_file in document_files:
+            document = Document.objects.create(
+                visa_details=visa_details,
+                document_type=document_type,
+                document_file=document_file
+            )
+            if document.document_file:
+                request = self.context.get('request')
+                file_url = document.document_file.url
+                if request:
+                    file_url = request.build_absolute_uri(file_url)
+                file_urls.append(file_url)
+                
+        # Get the display name for the document type
+        document_name = dict(self.fields['document_type'].choices).get(document_type)
+            
+        return [{
+            'document_type': document_type,
+            'document_name': document_name,
+            'document_file': file_urls
+        }]
+
+
+
+class VehicleSerializer(serializers.ModelSerializer):
+    vehicle_image_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Vehicle
+        fields = '__all__'
+
+    def get_vehicle_image_url(self, obj):
+        if obj.vehicle_image and hasattr(obj.vehicle_image, 'url'):
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.vehicle_image.url)
+            return obj.vehicle_image.url
+        return None        
+
+
+class VehicleIssueSerializer(serializers.ModelSerializer):
+    reported_by_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = VehicleIssue
+        fields = [
+            'id', 'title', 
+            'reported_by_name',
+            'reported_date', 'status'
+        ]
+
+    def get_reported_by_name(self, obj):
+        """Get reporter's full name"""
+        if obj.reported_by:
+            # Try different methods to get the name
+            if obj.reported_by.employee_name:
+                full_name = obj.reported_by.employee_name
+                if full_name:
+                    return full_name
+            return str(obj.reported_by)
+        return "Unknown"
+    
+
+
+class DailyOdometerReadingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DailyOdometerReading
+        fields = '__all__'
+        read_only_fields = ['created_at']
+
+
+
+
+class VehicleDetailsSerializer(serializers.Serializer):
+    class CurrentVehicleSerializer(serializers.Serializer):
+        vehicle_images = serializers.SerializerMethodField()
+        vehicle_number = serializers.SerializerMethodField()
+        model = serializers.SerializerMethodField()
+        vehicle_type = serializers.SerializerMethodField()
+        assigned_date = serializers.SerializerMethodField()
+        ending_date = serializers.SerializerMethodField()
+        insurance_expiry_date = serializers.SerializerMethodField()
+        fuel_type = serializers.SerializerMethodField()
+        odometer_start_km = serializers.SerializerMethodField()
+        odometer_end_km = serializers.SerializerMethodField()
+        reported_vehicle_issues = serializers.SerializerMethodField() 
+
+        def get_vehicle_images(self, obj):
+            """Get all vehicle images"""
+            if not obj.vehicle:
+                return []
+            images = obj.vehicle.images.all()
+            request = self.context.get('request')
+            urls = []
+            for img in images:
+                if img.image:
+                    url = img.image.url
+                    if request:
+                        url = request.build_absolute_uri(url)
+                    urls.append(url)
+            return urls
+
+        
+        def get_vehicle_number(self, obj):
+            """Get vehicle number"""
+            if obj.vehicle:
+                return obj.vehicle.vehicle_number
+            return None
+        
+        def get_model(self, obj):
+            """Get vehicle model"""
+            if obj.vehicle:
+                return obj.vehicle.model
+            return None
+        
+        def get_vehicle_type(self, obj):
+            """Get vehicle type"""
+            if obj.vehicle:
+                return obj.vehicle.vehicle_type
+            return None
+        
+        def get_assigned_date(self, obj):
+            return obj.current_vehicle_assigned_date
+        
+        def get_ending_date(self, obj):
+            return obj.current_vehicle_ending_date
+        
+        def get_insurance_expiry_date(self, obj):
+            if obj.vehicle:
+                return obj.vehicle.insurance_expiry_date
+            return None
+        
+        def get_fuel_type(self, obj):
+            if obj.vehicle:
+                return obj.vehicle.get_fuel_type_display()
+            return None
+        
+        def get_reported_vehicle_issues(self, obj):
+            """Get ALL reported issues for this vehicle"""
+            if obj.vehicle:
+                issues = VehicleIssue.objects.filter(
+                    vehicle=obj.vehicle
+                ).order_by('-reported_date', '-created_at')
+                
+                return VehicleIssueSerializer(issues, many=True).data
+            return []
+        
+        def get_odometer_start_km(self, obj):
+            try:
+                dubai_tz = pytz.timezone('Asia/Dubai')
+                
+                today_dubai = timezone.localtime(timezone.now(), dubai_tz).date()
+                
+                if obj.vehicle:
+                    reading = DailyOdometerReading.objects.get(
+                        vehicle=obj.vehicle,
+                        reading_date=today_dubai
+                    )
+                    return reading.start_km
+            except DailyOdometerReading.DoesNotExist:
+                return None
+            return None
+        
+        def get_odometer_end_km(self, obj):
+            try:
+                dubai_tz = pytz.timezone('Asia/Dubai')
+                
+                today_dubai = timezone.localtime(timezone.now(), dubai_tz).date()
+                
+                if obj.vehicle:
+                    reading = DailyOdometerReading.objects.get(
+                        vehicle=obj.vehicle,
+                        reading_date=today_dubai
+                    )
+                    return reading.end_km
+            except DailyOdometerReading.DoesNotExist:
+                return None
+            return None
+        
+    class TemporaryVehicleSerializer(serializers.Serializer):
+        vehicle_images = serializers.SerializerMethodField()
+        vehicle_number = serializers.SerializerMethodField()
+        model = serializers.SerializerMethodField()
+        vehicle_type = serializers.SerializerMethodField()
+        temporary_vehicle_assigned_date = serializers.SerializerMethodField()
+        temporary_vehicle_ending_date = serializers.SerializerMethodField()
+        temporary_vehicle_assigned_time = serializers.SerializerMethodField()
+        temporary_vehicle_ending_time = serializers.SerializerMethodField()
+        insurance_expiry_date = serializers.SerializerMethodField()
+        fuel_type = serializers.SerializerMethodField()
+        odometer_start_km = serializers.SerializerMethodField()
+        odometer_end_km = serializers.SerializerMethodField()
+        reported_vehicle_issues = serializers.SerializerMethodField()
+        
+        
+        def get_vehicle_images(self, obj):
+            """Get all temporary vehicle images"""
+            images = obj.temporary_images.all()
+            request = self.context.get('request')
+            urls = []
+            for img in images:
+                if img.image:
+                    url = img.image.url
+                    if request:
+                        url = request.build_absolute_uri(url)
+                    urls.append(url)
+            return urls
+        
+        def get_vehicle_number(self, obj):
+            """Get temporary vehicle number"""
+            return obj.temporary_vehicle_number
+        
+        def get_model(self, obj):
+            """Get temporary vehicle model"""
+            return obj.temporary_vehicle_model
+        
+        def get_vehicle_type(self, obj):
+            """Get temporary vehicle type"""
+            return obj.temporary_vehicle_type
+        
+        def get_temporary_vehicle_assigned_date(self, obj):
+            """Get assigned date for temporary vehicle"""
+            return obj.temporary_vehicle_assigned_date
+        
+        def get_temporary_vehicle_ending_date(self, obj):
+            """Get ending date for temporary vehicle"""
+            return obj.temporary_vehicle_ending_date
+        
+        def get_temporary_vehicle_assigned_time(self, obj):
+            """Get assigned date for temporary vehicle"""
+            return obj.temporary_vehicle_assigned_time
+        
+        def get_temporary_vehicle_ending_time(self, obj):
+            """Get ending date for temporary vehicle"""
+            return obj.temporary_vehicle_ending_time
+
+        def get_insurance_expiry_date(self, obj):
+            """Get insurance expiry date for temporary vehicle"""
+            return obj.temporary_vehicle_insurance_expiry_date
+        
+        def get_fuel_type(self, obj):
+            """Get fuel type for temporary vehicle"""
+            return obj.temporary_vehicle_fuel_type
+        
+        def get_reported_vehicle_issues(self, obj):
+            """Get reported issues for temporary vehicle"""
+            return []
+        
+        def get_odometer_start_km(self, obj):
+            """Get odometer start km for temporary vehicle"""
+            return None
+        
+        def get_odometer_end_km(self, obj):
+            """Get odometer end km for temporary vehicle"""
+            return None
+    
+    # Use SerializerMethodField to dynamically determine which serializer to use
+    current_vehicle = serializers.SerializerMethodField()
+    temporary_vehicle = serializers.SerializerMethodField()
+    
+    def get_current_vehicle(self, obj):
+        """Show current vehicle only when status is 'current_vehicle'"""
+        if obj.status == 'current_vehicle':
+            return self.CurrentVehicleSerializer(obj, context=self.context).data
+        return None
+    
+    def get_temporary_vehicle(self, obj):
+        """Show temporary vehicle only when status is 'temporary_vehicle'"""
+        if obj.status == 'temporary_vehicle':
+            return self.TemporaryVehicleSerializer(obj, context=self.context).data
+        return None
+
+    
+
+
+
+
+class ReportVehicleIssueSerializer(serializers.ModelSerializer):
+    images = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = VehicleIssue
+        fields = ['id', 'title', 'reported_date', 'status', 'description', 'images']
+        extra_kwargs = {
+            'title': {'required': True},
+            'reported_date': {'required': True},
+            'status': {'required': True},
+            'description': {'required': False, 'allow_blank': True},
+        }
+
+    
+    def validate_status(self, value):
+        """Validate status choices"""
+        valid_statuses = ['open', 'in_progress', 'resolved', 'ignored']
+        if value not in valid_statuses:
+            raise serializers.ValidationError(
+                f"Status must be one of: {', '.join(valid_statuses)}"
+            )
+        return value
+    
+    def validate_reported_date(self, value):
+        """Validate reported date is not in the future (Dubai time)"""
+        # Get Dubai timezone
+        dubai_tz = pytz.timezone('Asia/Dubai')
+        
+        # Get current date IN DUBAI
+        today_dubai = timezone.localtime(timezone.now(), dubai_tz).date()
+        
+        if value > today_dubai:
+            raise serializers.ValidationError("Reported date cannot be in the future")
+        return value
+    
+    def get_images(self, obj):
+        request = self.context.get('request')
+        return [request.build_absolute_uri(img.image.url) if request else img.image.url for img in obj.images.all()]
+    
+
+
+import re
+
+class CreateTemporaryVehicleSerializer(serializers.Serializer):
+    vehicle_number = serializers.CharField(
+        max_length=50, 
+        required=True,
+        trim_whitespace=True,
+        help_text="Vehicle registration number"
+    )
+    vehicle_model = serializers.CharField(
+        max_length=100, 
+        required=True,
+        trim_whitespace=True,
+        help_text="Vehicle model name"
+    )
+    
+    vehicle_type = serializers.CharField(
+        max_length=50, 
+        required=False,
+        help_text="Type of vehicle (e.g., sedan, SUV)"
+    )
+    fuel_type = serializers.CharField(
+        max_length=50, 
+        required=False,
+        default='petrol',
+        help_text="Fuel type (e.g., petrol, diesel)"
+    )
+    start_date = serializers.CharField(
+        max_length=100, 
+        required=True,
+        help_text="Start date (YYYY-MM-DD format)"
+    )
+    end_date = serializers.CharField(
+        max_length=100, 
+        required=True,
+        help_text="End date (YYYY-MM-DD format)"
+    )
+    start_time = serializers.CharField(
+        max_length=100, 
+        required=True,
+        help_text="Start time (HH:MM format, 24-hour)"
+    )
+    end_time = serializers.CharField(
+        max_length=100, 
+        required=True,
+        help_text="End time (HH:MM format, 24-hour)"
+    )
+    add_note = serializers.CharField(
+        required=False, 
+        allow_blank=True,
+        max_length=1000,
+        help_text="Additional notes about the assignment"
+    )
+    location = serializers.CharField(
+        max_length=255, 
+        required=False, 
+        allow_blank=True,
+        help_text="Location where vehicle will be used"
+    )
+    
+    def validate_vehicle_number(self, value):
+        """Validate vehicle number format"""
+        value = value.strip().upper()
+        
+        if not value:
+            raise serializers.ValidationError("Vehicle number cannot be empty")
+        
+        if len(value) < 3:
+            raise serializers.ValidationError("Vehicle number is too short")
+        
+        return value
+    
+    def validate_vehicle_model(self, value):
+        """Validate vehicle model"""
+        value = value.strip()
+        
+        if not value:
+            raise serializers.ValidationError("Vehicle model cannot be empty")
+        
+        if len(value) < 2:
+            raise serializers.ValidationError("Vehicle model is too short")
+        
+        return value
+    
+    def validate_start_date(self, value):
+        """Validate start date format (Dubai timezone aware)"""
+        value = value.strip()
+        
+        try:
+            # Validate format
+            parsed_date = datetime.strptime(value, '%Y-%m-%d').date()
+            
+            # OPTIONAL: Add Dubai timezone check if needed
+            # dubai_tz = pytz.timezone('Asia/Dubai')
+            # today_dubai = DubaiTimeZoneHelper.get_current_dubai_date()
+            # 
+            # if parsed_date < today_dubai:
+            #     raise serializers.ValidationError(
+            #         f"Start date cannot be in the past. Today is {today_dubai}"
+            #     )
+            
+        except ValueError:
+            raise serializers.ValidationError(
+                "Start date must be in YYYY-MM-DD format (e.g., 2024-12-18)"
+            )
+        
+        return value
+        
+    def validate_end_date(self, value):
+        """Validate end date format and ensure it's after start date (Dubai aware)"""
+        value = value.strip()
+        
+        try:
+            parsed_end_date = datetime.strptime(value, '%Y-%m-%d').date()
+        except ValueError:
+            raise serializers.ValidationError(
+                "End date must be in YYYY-MM-DD format (e.g., 2024-12-20)"
+            )
+        
+        # Get start date from initial data for comparison
+        start_date_str = self.initial_data.get('start_date')
+        if start_date_str:
+            try:
+                parsed_start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
+                if parsed_end_date < parsed_start_date:
+                    raise serializers.ValidationError("End date must be after start date")
+            except ValueError:
+                pass
+        
+        return value
+
+    
+    def validate(self, data):
+        """
+        Object-level validation for date/time consistency (Dubai timezone aware).
+        """
+        try:
+            # Parse dates
+            start_date = datetime.strptime(data['start_date'], '%Y-%m-%d').date()
+            end_date = datetime.strptime(data['end_date'], '%Y-%m-%d').date()
+            
+            if end_date < start_date:
+                raise serializers.ValidationError({
+                    'end_date': 'End date must be on or after start date.'
+                })
+            elif end_date == start_date:
+                # If same day, check times
+                start_time = datetime.strptime(data['start_time'], '%H:%M').time()
+                end_time = datetime.strptime(data['end_time'], '%H:%M').time()
+                if end_time <= start_time:
+                    raise serializers.ValidationError({
+                        'end_time': 'End time must be after start time when on the same day.'
+                    })
+                    
+        except (ValueError, KeyError):
+            pass
+        
+        return data 
+
+
+
+
+
+
+
+from .models import ReportIssue
+
+class ReportIssueSerializer(serializers.ModelSerializer):
+    media_files = serializers.SerializerMethodField()
+    
+
+    
+    class Meta:
+        model = ReportIssue
+        fields = [
+            'id',
+            'employee',
+            'date',
+            'time',
+            'location',
+            'issue_category',
+            'description',
+            'media_files',
+            'created_at'
+        ]
+        read_only_fields = ['employee']
+    
+    def get_media_files(self, obj):
+        request = self.context.get('request')
+        urls = []
+        for media in obj.media_files.all():
+            if media.media_file:
+                url = media.media_file.url
+                if request:
+                    url = request.build_absolute_uri(url)
+                urls.append(url)
+        return urls
+    
+
+    
+    def create(self, validated_data):
+        return ReportIssue.objects.create(**validated_data)

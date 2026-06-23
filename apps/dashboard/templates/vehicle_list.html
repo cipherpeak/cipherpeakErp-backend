@@ -1,0 +1,738 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="main-content-container overflow-hidden">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4 mt-1">
+        <h3 class="mb-0 text-dark">Vehicle Management</h3>
+        <div class="d-flex gap-2">
+            <button type="button" class="btn btn-primary d-flex align-items-center gap-2" data-bs-toggle="modal"
+                data-bs-target="#addVehicleModal"
+                style="border-radius: 8px; font-weight: 500; border: 1px solid #007bff; background-color: #007bff; color: white; padding: 10px 20px; font-size: 14px; min-height: 42px; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease;">
+                <i class="material-symbols-outlined fs-16 text-white">add</i>
+                Add Vehicle
+            </button>
+        </div>
+    </div>
+
+    <!-- Display Messages -->
+    {% if messages %}
+    <div class="mb-4">
+        {% for message in messages %}
+        <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show rounded-8"
+            role="alert" style="border-radius: 8px;">
+            <div class="d-flex align-items-center">
+                <i class="material-symbols-outlined me-2 fs-16">
+                    {% if message.tags == 'success' %}check_circle{% endif %}
+                    {% if message.tags == 'error' or message.tags == 'danger' %}error{% endif %}
+                    {% if message.tags == 'warning' %}warning{% endif %}
+                    {% if message.tags == 'info' %}info{% endif %}
+                </i>
+                <span class="fw-medium">{{ message }}</span>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Vehicles Grid -->
+    <div class="row g-4">
+        {% for vehicle in vehicles %}
+        <div class="col-xl-4 col-lg-6 col-md-6">
+            <!-- White Card Design -->
+            <div class="card bg-white shadow-sm border-0 rounded-12 mb-4 h-100 transition-all vehicle-card"
+                style="border-radius: 12px !important; border: 1px solid #f1f1f1 !important; background: #ffffff; transition: all 0.3s ease; box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04); position: relative; overflow: hidden;">
+                <div class="card-body d-flex flex-column p-0">
+                    <!-- Image Section with Overlay Buttons -->
+                    <div class="position-relative" style="height: 180px;">
+                        {% if vehicle.images.exists %}
+                        <img src="{{ vehicle.images.first.image.url }}" alt="{{ vehicle.model }}"
+                            class="w-100 h-100 object-fit-cover">
+                        {% else %}
+                        <div class="w-100 h-100 d-flex flex-column align-items-center justify-content-center bg-light"
+                            style="background-color: #f8f9fa;">
+                            <i class="material-symbols-outlined fs-48 text-secondary opacity-50">directions_car</i>
+                        </div>
+                        {% endif %}
+
+                        <!-- Status Badge (Top-Left) -->
+                        <div class="position-absolute top-0 start-0 m-3">
+                            <span class="badge shadow-sm"
+                                style="font-size: 11px; font-weight: 600; padding: 6px 14px; border-radius: 30px; backdrop-filter: blur(4px); background-color: {% if vehicle.assignments.exists %}rgba(25, 135, 84, 0.9){% else %}rgba(255, 193, 7, 0.9){% endif %} !important; color: #fff;">
+                                {% if vehicle.assignments.exists %}
+                                    {% for assignment in vehicle.assignments.all %}
+                                        {% if forloop.first %}{{ assignment.employee.employee_name }}{% endif %}
+                                    {% endfor %}
+                                {% else %}
+                                    Available
+                                {% endif %}
+                            </span>
+                        </div>
+
+                        <!-- Action Buttons (Top-Right) -->
+                        <div class="position-absolute top-0 end-0 m-3 d-flex gap-2" style="z-index: 20;">
+                            <button
+                                class="btn btn-white btn-sm shadow-sm d-flex align-items-center justify-content-center edit-vehicle-btn"
+                                data-id="{{ vehicle.id }}" data-number="{{ vehicle.vehicle_number }}"
+                                data-model="{{ vehicle.model }}" data-type="{{ vehicle.vehicle_type|default:'' }}"
+                                data-fuel="{{ vehicle.fuel_type }}"
+                                data-expiry="{{ vehicle.insurance_expiry_date|date:'Y-m-d' }}"
+                                data-images='[{% for img in vehicle.images.all %}{"id": "{{ img.id }}", "url": "{{ img.image.url }}"}{% if not forloop.last %},{% endif %}{% endfor %}]'
+                                style="width: 38px; height: 38px; padding: 0 !important; border-radius: 50% !important; background: #ffffff; border: none; color: #3b82f6; transition: transform 0.2s ease, box-shadow 0.2s ease;">
+                                <i class="material-symbols-outlined" style="font-size: 20px;">edit</i>
+                            </button>
+                            <button
+                                class="btn btn-white btn-sm shadow-sm d-flex align-items-center justify-content-center delete-vehicle-btn"
+                                data-id="{{ vehicle.id }}" data-number="{{ vehicle.vehicle_number }}"
+                                style="width: 38px; height: 38px; padding: 0 !important; border-radius: 50% !important; background: #ffffff; border: none; color: #ef4444; transition: transform 0.2s ease, box-shadow 0.2s ease;">
+                                <i class="material-symbols-outlined" style="font-size: 20px;">delete</i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Content Section -->
+                    <div class="p-4 flex-grow-1 d-flex flex-column">
+                        <div class="mb-3">
+                            <h5 class="text-dark mb-1 fw-bold fs-18" style="color: #1a1f2c;">{{ vehicle.vehicle_number}}
+                            </h5>
+                            <p class="text-muted mb-0 fs-14 fw-medium">{{ vehicle.model }}</p>
+                        </div>
+
+                        <div class="mt-auto">
+                            <div class="row g-3">
+                                <div class="col-6">
+                                    <div class="p-2 rounded-8"
+                                        style="background-color: #f8fafc; border: 1px solid #f1f5f9;">
+                                        <span class="d-block text-secondary fs-11 fw-semibold text-uppercase mb-1"
+                                            style="letter-spacing: 0.5px;">Type</span>
+                                        <span class="d-block text-dark fw-bold fs-13">{{ vehicle.vehicle_type|default:"-" }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="p-2 rounded-8"
+                                        style="background-color: #f8fafc; border: 1px solid #f1f5f9;">
+                                        <span class="d-block text-secondary fs-11 fw-semibold text-uppercase mb-1"
+                                            style="letter-spacing: 0.5px;">Fuel</span>
+                                        <span
+                                            class="d-block text-dark fw-bold fs-13 text-capitalize">{{vehicle.get_fuel_type_display }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="d-flex align-items-center gap-2 pt-2 border-top"
+                                        style="border-color: #f1f5f9 !important;">
+                                        <i class="material-symbols-outlined fs-16 text-secondary">verified_user</i>
+                                        <span class="text-secondary fs-13">Insurance expires: <span
+                                                class="text-dark fw-medium">{{ vehicle.insurance_expiry_date  }}</span></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="card bg-white shadow-sm border-0 rounded-12"
+                style="border-radius: 12px !important; border: 1px solid #f1f1f1 !important; background: linear-gradient(180deg, #ffffff 0%, #fcfcfc 100%); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);">
+                <div class="card-body text-center py-5" style="padding: 48px 20px;">
+                    <i class="material-symbols-outlined fs-48 text-muted mb-3 opacity-50"
+                        style="font-size: 48px; color: #6c757d; margin-bottom: 16px; opacity: 0.5;">directions_car</i>
+                    <h5 class="text-dark mb-2 fw-semibold"
+                        style="font-weight: 600 !important; color: #212529; margin-bottom: 8px;">No Vehicles Found</h5>
+                    <p class="text-muted mb-4 fs-14" style="font-size: 14px; color: #6c757d; margin-bottom: 24px;">Add
+                        vehicles to manage your fleet.</p>
+                    <button type="button" class="btn btn-primary d-flex align-items-center gap-2 mx-auto"
+                        data-bs-toggle="modal" data-bs-target="#addVehicleModal"
+                        style="border-radius: 8px; font-weight: 500; border: 1px solid #007bff; background-color: #007bff; color: white; padding: 10px 20px; font-size: 14px; min-height: 42px; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; margin: 0 auto;">
+                        <i class="material-symbols-outlined fs-16 text-white">add</i>
+                        Add First Vehicle
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Add Vehicle Modal -->
+<div class="modal fade" id="addVehicleModal" tabindex="-1" aria-labelledby="addVehicleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow-lg">
+            <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
+                <div>
+                    <h5 class="modal-title fw-bold text-dark fs-5" id="addVehicleModalLabel">Add New Vehicle</h5>
+                    <p class="text-muted mb-0 fs-14">Register a new vehicle to the fleet</p>
+                </div>
+                <button type="button" class="btn-close bg-light p-2 rounded-circle" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form id="addVehicleForm" action="{% url 'add-vehicle' %}" method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <label class="form-label fw-semibold text-dark fs-14">Vehicle Number</label>
+                            <input type="text" class="form-control bg-light border-0 fs-14 field-height"
+                                name="vehicle_number" placeholder="e.g. DXB-12345" required>
+                        </div>
+
+                        <div class="col-md-12">
+                            <label class="form-label fw-semibold text-dark fs-14">Model</label>
+                            <input type="text" class="form-control bg-light border-0 fs-14 field-height" name="model"
+                                placeholder="e.g. Toyota Corolla 2024" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold text-dark fs-14">Vehicle Type</label>
+                            <input type="text" class="form-control bg-light border-0 fs-14 field-height"
+                                name="vehicle_type" placeholder="e.g. Sedan">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold text-dark fs-14">Fuel Type</label>
+                            <select class="form-select bg-light border-0 fs-14 field-height" name="fuel_type" required>
+                                <option value="">Select...</option>
+                                {% for code, label in fuel_types %}
+                                <option value="{{ code }}">{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-md-12">
+                            <label class="form-label fw-semibold text-dark fs-14">Insurance Expiry Date</label>
+                            <input type="date" class="form-control bg-light border-0 fs-14 field-height"
+                                name="insurance_expiry_date" required>
+                        </div>
+
+                        <div class="col-md-12">
+                            <label class="form-label fw-semibold text-dark fs-14">Vehicle Images</label>
+                            <div class="upload-zone" id="dropZone">
+                                <input type="file" name="vehicle_images" accept="image/*" id="vehicleImageInput"
+                                    multiple onchange="updateFileName(this, 'fileName')">
+                                <div class="text-center p-3">
+                                    <i class="material-symbols-outlined fs-40 text-primary mb-2">cloud_upload</i>
+                                    <p class="mb-1 fw-bold text-dark fs-14">Click to upload or drag & drop</p>
+                                    <p class="text-muted fs-12 mb-0" id="fileName">Select multiple images (max. 5MB
+                                        each)</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid mt-4 pt-2">
+                        <button type="submit" id="addVehicleBtn"
+                            class="btn btn-primary btn-lg text-white fw-medium shadow-sm transition-transform field-height d-flex align-items-center justify-content-center">
+                            Add Vehicle
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Vehicle Modal -->
+<div class="modal fade" id="editVehicleModal" tabindex="-1" aria-labelledby="editVehicleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow-lg">
+            <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
+                <div>
+                    <h5 class="modal-title fw-bold text-dark fs-5" id="editVehicleModalLabel">Edit Vehicle</h5>
+                    <p class="text-muted mb-0 fs-14">Update vehicle details</p>
+                </div>
+                <button type="button" class="btn-close bg-light p-2 rounded-circle" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form id="editVehicleForm" method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <label class="form-label fw-semibold text-dark fs-14">Vehicle Number</label>
+                            <input type="text" class="form-control bg-light border-0 fs-14 field-height"
+                                name="vehicle_number" id="edit_vehicle_number" required>
+                        </div>
+
+                        <div class="col-md-12">
+                            <label class="form-label fw-semibold text-dark fs-14">Model</label>
+                            <input type="text" class="form-control bg-light border-0 fs-14 field-height" name="model"
+                                id="edit_model" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold text-dark fs-14">Vehicle Type</label>
+                            <input type="text" class="form-control bg-light border-0 fs-14 field-height"
+                                name="vehicle_type" id="edit_vehicle_type">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold text-dark fs-14">Fuel Type</label>
+                            <select class="form-select bg-light border-0 fs-14 field-height" name="fuel_type"
+                                id="edit_fuel_type" required>
+                                <option value="">Select...</option>
+                                {% for code, label in fuel_types %}
+                                <option value="{{ code }}">{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-md-12">
+                            <label class="form-label fw-semibold text-dark fs-14">Insurance Expiry Date</label>
+                            <input type="date" class="form-control bg-light border-0 fs-14 field-height"
+                                name="insurance_expiry_date" id="edit_insurance_expiry_date" required>
+                        </div>
+
+                        <div class="col-md-12">
+                            <label class="form-label fw-semibold text-dark fs-14">Vehicle Images</label>
+
+                            <!-- Existing Images Preview -->
+                            <div id="existingImagesContainer" class="mb-2 d-none">
+                                <div class="d-flex flex-wrap gap-3 p-3 bg-light rounded-3 border"
+                                    id="existingImagesList">
+                                    <!-- Images will be injected here -->
+                                </div>
+                                <p class="mb-0 fs-12 text-muted mt-2">Click the &times; on an image to delete it.</p>
+                            </div>
+
+                            <div class="upload-zone" id="editDropZone">
+                                <input type="file" name="vehicle_images" accept="image/*" id="editVehicleImageInput"
+                                    multiple onchange="updateFileName(this, 'editFileName')">
+                                <div class="text-center p-3">
+                                    <i class="material-symbols-outlined fs-40 text-primary mb-2">cloud_upload</i>
+                                    <p class="mb-1 fw-bold text-dark fs-14">Click to upload or drag & drop</p>
+                                    <p class="text-muted fs-12 mb-0" id="editFileName">Add more images (Optional)</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid mt-4 pt-2">
+                        <button type="submit" id="editVehicleBtn"
+                            class="btn btn-primary btn-lg text-white fw-medium shadow-sm transition-transform field-height d-flex align-items-center justify-content-center">
+                            Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteVehicleModal" tabindex="-1" aria-labelledby="deleteVehicleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-12"
+            style="border-radius: 12px !important; border: 1px solid #f1f1f1; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);">
+            <div class="modal-header bg-white border-0 pb-0 pt-4 px-4"
+                style="background-color: #ffffff !important; border-bottom: 0;">
+                <h5 class="modal-title text-dark mb-0 fw-semibold" id="deleteVehicleModalLabel">
+                    <i class="material-symbols-outlined me-2 fs-16 text-danger">warning</i>
+                    Delete Vehicle
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body bg-white px-4 pt-0">
+                <p class="text-muted mb-3 fs-14" style="margin-top: 16px;">Are you sure you want to delete this vehicle?
+                    This action cannot be undone.</p>
+                <div class="bg-light-subtle rounded-8 p-3"
+                    style="background-color: #f8f9fa !important; border-radius: 8px;">
+                    <strong id="vehicleToDelete" class="text-dark fs-14"></strong>
+                </div>
+            </div>
+            <div class="modal-footer bg-white border-0 pt-3 px-4 pb-4">
+                <div class="row g-2 w-100">
+                    <div class="col-md-6">
+                        <button type="button"
+                            class="btn btn-light w-100 d-flex align-items-center justify-content-center gap-2 py-2 border"
+                            data-bs-dismiss="modal" style="border-radius: 8px;">
+                            <i class="material-symbols-outlined fs-16">close</i>
+                            Cancel
+                        </button>
+                    </div>
+                    <div class="col-md-6">
+                        <button type="button"
+                            class="btn btn-danger text-white w-100 d-flex align-items-center justify-content-center gap-2 py-2"
+                            id="confirmDeleteVehicleBtn" style="border-radius: 8px;">
+                            <i class="material-symbols-outlined fs-16 text-white">delete</i>
+                            Delete
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Image Confirmation Modal -->
+<div class="modal fade" id="deleteImageModal" tabindex="-1" aria-labelledby="deleteImageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content rounded-12"
+            style="border-radius: 12px !important; border: 1px solid #f1f1f1; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);">
+            <div class="modal-header bg-white border-0 pb-0 pt-4 px-4"
+                style="background-color: #ffffff !important; border-bottom: 0;">
+                <h5 class="modal-title text-dark mb-0 fw-semibold" id="deleteImageModalLabel">
+                    <i class="material-symbols-outlined me-2 fs-16 text-danger">warning</i>
+                    Delete Image
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body bg-white px-4 pt-0">
+                <p class="text-muted mb-3 fs-14" style="margin-top: 16px;">Are you sure you want to delete this image?
+                </p>
+            </div>
+            <div class="modal-footer bg-white border-0 pt-3 px-4 pb-4">
+                <div class="row g-2 w-100">
+                    <div class="col-6">
+                        <button type="button"
+                            class="btn btn-light w-100 d-flex align-items-center justify-content-center gap-2 py-2 border"
+                            data-bs-dismiss="modal" style="border-radius: 8px;">
+                            Cancel
+                        </button>
+                    </div>
+                    <div class="col-6">
+                        <button type="button"
+                            class="btn btn-danger text-white w-100 d-flex align-items-center justify-content-center gap-2 py-2"
+                            id="confirmDeleteImageBtn" style="border-radius: 8px;">
+                            Delete
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function updateFileName(input, labelId) {
+        const fileNameElement = document.getElementById(labelId);
+        if (input.files && input.files.length > 0) {
+            if (input.files.length === 1) {
+                fileNameElement.textContent = input.files[0].name;
+            } else {
+                fileNameElement.textContent = `${input.files.length} images selected`;
+            }
+            fileNameElement.classList.add('text-primary', 'fw-bold');
+            fileNameElement.classList.remove('text-muted');
+        } else {
+            if (labelId === 'fileName') {
+                fileNameElement.textContent = "Select multiple images (max. 5MB each)";
+            } else {
+                fileNameElement.textContent = "Add more images (Optional)";
+            }
+            fileNameElement.classList.add('text-muted');
+            fileNameElement.classList.remove('text-primary', 'fw-bold');
+        }
+    }
+
+    function openEditModal(id, number, model, type, fuel, expiry, imageUrls) {
+        document.getElementById('edit_vehicle_number').value = number;
+        document.getElementById('edit_model').value = model;
+        document.getElementById('edit_vehicle_type').value = type;
+        document.getElementById('edit_fuel_type').value = fuel;
+        document.getElementById('edit_insurance_expiry_date').value = expiry;
+
+        // Handle Existing Images
+        const imgContainer = document.getElementById('existingImagesContainer');
+        const imgList = document.getElementById('existingImagesList');
+        imgList.innerHTML = '';
+
+        if (imageUrls && imageUrls.length > 0) {
+            imageUrls.forEach(imgData => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'position-relative';
+                wrapper.style.width = '70px';
+                wrapper.style.height = '70px';
+
+                const img = document.createElement('img');
+                img.src = imgData.url;
+                img.className = 'rounded-2 object-fit-cover w-100 h-100 border';
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.type = 'button';
+                deleteBtn.className = 'position-absolute top-0 end-0 bg-danger text-white border-0 rounded-circle d-flex align-items-center justify-content-center shadow-sm';
+                deleteBtn.style.width = '20px';
+                deleteBtn.style.height = '20px';
+                deleteBtn.style.margin = '-8px -8px 0 0';
+                deleteBtn.innerHTML = '&times;';
+                deleteBtn.onclick = () => deleteVehicleImage(imgData.id, wrapper);
+
+                wrapper.appendChild(img);
+                wrapper.appendChild(deleteBtn);
+                imgList.appendChild(wrapper);
+            });
+            imgContainer.classList.remove('d-none');
+        } else {
+            imgContainer.classList.add('d-none');
+        }
+
+        const form = document.getElementById('editVehicleForm');
+        // Use Django's url tag for correctness, replacing placeholder '0' with actual ID
+        form.action = "{% url 'update-vehicle' 0 %}".replace('0', id);
+
+        const modal = new bootstrap.Modal(document.getElementById('editVehicleModal'));
+        modal.show();
+    }
+
+    let currentVehicleId = null;
+    let imageToDeleteId = null;
+    let imageToDeleteElement = null;
+
+    function showDeleteModal(id, number) {
+        currentVehicleId = id;
+        document.getElementById('vehicleToDelete').textContent = number;
+        const deleteModal = new bootstrap.Modal(document.getElementById('deleteVehicleModal'));
+        deleteModal.show();
+    }
+
+    function deleteVehicleImage(imageId, element) {
+        imageToDeleteId = imageId;
+        imageToDeleteElement = element;
+        const deleteImageModal = new bootstrap.Modal(document.getElementById('deleteImageModal'));
+        deleteImageModal.show();
+    }
+
+    document.getElementById('confirmDeleteImageBtn').addEventListener('click', function () {
+        if (!imageToDeleteId || !imageToDeleteElement) return;
+
+        const deleteBtn = this;
+        const originalText = deleteBtn.innerHTML;
+        deleteBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Deleting...';
+        deleteBtn.disabled = true;
+
+        const url = "{% url 'delete-vehicle-image' 0 %}".replace('0', imageToDeleteId);
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    imageToDeleteElement.remove();
+                    // Hide container if no images left
+                    const imgList = document.getElementById('existingImagesList');
+                    if (imgList.children.length === 0) {
+                        document.getElementById('existingImagesContainer').classList.add('d-none');
+                    }
+                    bootstrap.Modal.getInstance(document.getElementById('deleteImageModal')).hide();
+                } else {
+                    alert(data.error || 'Failed to delete image');
+                }
+            })
+            .catch(error => {
+                alert('Error deleting image: ' + error);
+            })
+            .finally(() => {
+                deleteBtn.innerHTML = originalText;
+                deleteBtn.disabled = false;
+            });
+    });
+
+    document.getElementById('confirmDeleteVehicleBtn').addEventListener('click', function () {
+        if (currentVehicleId) {
+            deleteVehicle(currentVehicleId);
+        }
+    });
+
+    function deleteVehicle(id) {
+        const deleteBtn = document.getElementById('confirmDeleteVehicleBtn');
+        const originalText = deleteBtn.innerHTML;
+
+        deleteBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Deleting...';
+        deleteBtn.disabled = true;
+
+        // Construct URL using Django's url tag for correctness
+        const url = "{% url 'delete-vehicle' 0 %}".replace('0', id);
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+        })
+            .then(response => {
+                if (!response.ok) {
+                    // If response is not ok (e.g. 404, 500), parse JSON error or throw
+                    return response.json().then(errData => {
+                        throw new Error(errData.error || `HTTP error! status: ${response.status}`);
+                    }).catch(e => {
+                        // If JSON parse fails (e.g. HTML response), throw generic
+                        if (response.status === 404) throw new Error("Vehicle not found or URL incorrect.");
+                        throw new Error(`Request failed: ${response.statusText}`);
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    window.location.reload();
+                } else {
+                    throw new Error(data.error || 'Failed to delete vehicle');
+                }
+            })
+            .catch(error => {
+                alert(error.message || 'Failed to delete vehicle');
+                deleteBtn.innerHTML = originalText;
+                deleteBtn.disabled = false;
+            });
+    }
+
+    // Add card hover effects and event listeners
+    document.addEventListener('DOMContentLoaded', function () {
+        // Edit Vehicle Button Click
+        document.querySelectorAll('.edit-vehicle-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const id = this.getAttribute('data-id');
+                const number = this.getAttribute('data-number');
+                const model = this.getAttribute('data-model');
+                const type = this.getAttribute('data-type');
+                const fuel = this.getAttribute('data-fuel');
+                const expiry = this.getAttribute('data-expiry');
+                const images = JSON.parse(this.getAttribute('data-images') || '[]');
+                openEditModal(id, number, model, type, fuel, expiry, images);
+            });
+        });
+
+        // Delete Vehicle Button Click
+        document.querySelectorAll('.delete-vehicle-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const id = this.getAttribute('data-id');
+                const number = this.getAttribute('data-number');
+                showDeleteModal(id, number);
+            });
+        });
+
+        // Vehicle Card Hover
+        const cards = document.querySelectorAll('.vehicle-card');
+        cards.forEach(card => {
+            card.addEventListener('mouseenter', function () {
+                this.style.transform = 'translateY(-4px)';
+                this.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.08) !important';
+                this.style.borderColor = '#e0e0e0 !important';
+            });
+
+            card.addEventListener('mouseleave', function () {
+                this.style.transform = 'translateY(0)';
+                this.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.05)';
+                this.style.borderColor = '#f1f1f1 !important';
+            });
+        });
+
+        // Add loading spinner to Add Vehicle form
+        const addForm = document.getElementById('addVehicleForm');
+        if (addForm) {
+            addForm.addEventListener('submit', function () {
+                const btn = document.getElementById('addVehicleBtn');
+                const originalText = btn.innerText;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+                btn.disabled = true;
+
+                // Optional: Restore button if submission is prevented (e.g. valid failure)
+                // specific to ajax or client side validation failure if handled manually
+                // currently form submission reloads page so this is fine
+            });
+        }
+
+        // Add loading spinner to Edit Vehicle form
+        const editForm = document.getElementById('editVehicleForm');
+        if (editForm) {
+            editForm.addEventListener('submit', function () {
+                const btn = document.getElementById('editVehicleBtn');
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+                btn.disabled = true;
+            });
+        }
+    });
+</script>
+
+<style>
+    /* Modern Modal Styling & Overrides (Copied from employee_details.html) */
+    .modal-backdrop {
+        background-color: rgba(15, 23, 42, 0.6);
+        backdrop-filter: blur(4px);
+    }
+
+    .modal-content {
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+
+    .rounded-4 {
+        border-radius: 1rem !important;
+    }
+
+    .field-height {
+        height: 50px !important;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+        background-color: #fff !important;
+        border-color: #3b82f6 !important;
+    }
+
+    .bg-light {
+        background-color: #f8fafc !important;
+    }
+
+    .text-muted {
+        color: #94a3b8 !important;
+    }
+
+    .letter-spacing-1 {
+        letter-spacing: 0.05em;
+    }
+
+    .cursor-pointer {
+        cursor: pointer;
+    }
+
+    .transition-transform {
+        transition: transform 0.2s ease;
+    }
+
+    .transition-transform:active {
+        transform: scale(0.98);
+    }
+
+    /* Upload Zone Styling */
+    .upload-zone {
+        border: 2px dashed #cbd5e1;
+        border-radius: 12px;
+        background-color: #f8fafc;
+        position: relative;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        min-height: 120px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .upload-zone:hover {
+        border-color: #3b82f6;
+        background-color: #eff6ff;
+    }
+
+    .upload-zone input[type="file"] {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        opacity: 0;
+        cursor: pointer;
+        z-index: 10;
+    }
+</style>
+{% endblock %}

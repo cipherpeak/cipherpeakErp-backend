@@ -1,0 +1,423 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    select,
+    .form-select,
+    option,
+    input,
+    .form-control,
+    textarea {
+        color: #000000 !important;
+    }
+</style>
+<div class="main-content-container overflow-hidden">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4 mt-1">
+        <h3 class="mb-0 text-dark">{% if company %}Edit Company{% else %}Create Company{% endif %}</h3>
+        <div class="d-flex gap-2">
+            <a href="{% url 'company-list' %}" class="btn btn-outline-secondary d-flex align-items-center gap-2"
+                style="border-radius: 6px; font-weight: 500; border: 1px solid #6c757d; background-color: white; color: #6c757d; padding: 12px 24px; font-size: 14px; min-height: 48px; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; text-decoration: none;">
+                <i class="material-symbols-outlined fs-16">arrow_back</i>
+                Back to Companies
+            </a>
+        </div>
+    </div>
+
+    <!-- Display Messages -->
+    {% if messages %}
+    <div class="mb-4">
+        {% for message in messages %}
+        <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show rounded-8"
+            role="alert"
+            style="border: none; border-radius: 8px; background-color: {% if message.tags == 'success' %}#d1f2eb{% elif message.tags == 'error' or message.tags == 'danger' %}#f8d7da{% elif message.tags == 'warning' %}#fff3cd{% else %}#d1ecf1{% endif %}; color: {% if message.tags == 'success' %}#0f5132{% elif message.tags == 'error' or message.tags == 'danger' %}#721c24{% elif message.tags == 'warning' %}#856404{% else %}#0c5460{% endif %};">
+            <div class="d-flex align-items-center">
+                <i class="material-symbols-outlined me-2 fs-16">
+                    {% if message.tags == 'success' %}check_circle{% endif %}
+                    {% if message.tags == 'error' or message.tags == 'danger' %}error{% endif %}
+                    {% if message.tags == 'warning' %}warning{% endif %}
+                    {% if message.tags == 'info' %}info{% endif %}
+                </i>
+                <span class="fw-medium" style="font-weight: 500;">{{ message }}</span>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="card bg-white rounded-10 border border-white mb-4"
+        style="border-radius: 10px; background-color: #ffffff; border: 1px solid #ffffff;">
+        <div class="card-body" style="padding: 24px;">
+            <form method="POST" enctype="multipart/form-data" id="company-form">
+                {% csrf_token %}
+
+                <!-- Company Details Section -->
+                <div class="border-bottom pb-4 mb-4"
+                    style="border-bottom: 1px solid #e9ecef !important; padding-bottom: 24px; margin-bottom: 24px;">
+                    <h5 class="text-dark mb-3" style="color: #212529; margin-bottom: 16px;">
+                        <i class="material-symbols-outlined me-2 fs-16 text-primary"
+                            style="font-size: 16px; color: #007bff;">business</i>
+                        Company Details
+                    </h5>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3" style="margin-bottom: 16px;">
+                                <label class="form-label text-dark fw-medium"
+                                    style="font-weight: 500; margin-bottom: 8px; color: #212529;">Company Name <span
+                                        class="text-danger" style="color: #dc3545;">*</span></label>
+                                <input type="text" class="form-control bg-white" name="company_name" required
+                                    value="{{ company.company_name|default:'' }}" placeholder="Enter company name"
+                                    style="border-radius: 6px; border: 1px solid #dee2e6; padding: 10px 12px; font-size: 14px; background-color: #ffffff !important; width: 100%;">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3" style="margin-bottom: 16px;">
+                                <label class="form-label text-dark fw-medium"
+                                    style="font-weight: 500; margin-bottom: 8px; color: #212529;">Website</label>
+                                <input type="url" class="form-control bg-white" name="website"
+                                    value="{{ company.website|default:'' }}" placeholder="Enter website URL"
+                                    style="border-radius: 6px; border: 1px solid #dee2e6; padding: 10px 12px; font-size: 14px; background-color: #ffffff !important; width: 100%;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3" style="margin-bottom: 16px;">
+                                <label class="form-label text-dark fw-medium"
+                                    style="font-weight: 500; margin-bottom: 8px; color: #212529;">Email</label>
+                                <input type="email" class="form-control bg-white" name="email"
+                                    value="{{ company.email|default:'' }}" placeholder="Enter email address"
+                                    style="border-radius: 6px; border: 1px solid #dee2e6; padding: 10px 12px; font-size: 14px; background-color: #ffffff !important; width: 100%;">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3" style="margin-bottom: 16px;">
+                                <label class="form-label text-dark fw-medium"
+                                    style="font-weight: 500; margin-bottom: 8px; color: #212529;">Phone</label>
+                                <input type="text" class="form-control bg-white" name="phone"
+                                    value="{{ company.phone|default:'' }}" placeholder="Enter phone number"
+                                    style="border-radius: 6px; border: 1px solid #dee2e6; padding: 10px 12px; font-size: 14px; background-color: #ffffff !important; width: 100%;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3" style="margin-bottom: 16px;">
+                        <label class="form-label text-dark fw-medium"
+                            style="font-weight: 500; margin-bottom: 8px; color: #212529;">Address</label>
+                        <textarea class="form-control bg-white" name="address" rows="3"
+                            placeholder="Enter company address"
+                            style="border-radius: 6px; border: 1px solid #dee2e6; padding: 10px 12px; font-size: 14px; min-height: 100px; background-color: #ffffff !important; width: 100%;">{{ company.address|default:'' }}</textarea>
+                    </div>
+                </div>
+
+                <!-- Logo Section -->
+                <div class="border-bottom pb-4 mb-4"
+                    style="border-bottom: 1px solid #e9ecef !important; padding-bottom: 24px; margin-bottom: 24px;">
+                    <h5 class="text-dark mb-3" style="color: #212529; margin-bottom: 16px;">
+                        <i class="material-symbols-outlined me-2 fs-16 text-primary"
+                            style="font-size: 16px; color: #007bff;">image</i>
+                        Company Logo
+                    </h5>
+                    <div class="mb-3" style="margin-bottom: 16px;">
+                        <label class="form-label text-dark fw-medium"
+                            style="font-weight: 500; margin-bottom: 8px; color: #212529;">Upload Logo</label>
+                        {% if company.logo %}
+                        <div class="mb-3 d-flex align-items-center gap-3">
+                            <img src="{{ company.logo.url }}" alt="Current Logo"
+                                style="width: 60px; height: 60px; object-fit: contain; border-radius: 6px; border: 1px solid #dee2e6;">
+                            <span class="text-muted small">Current Logo</span>
+                        </div>
+                        {% endif %}
+                        <div class="file-upload-container" style="margin-top: 8px;">
+                            <div class="file-upload-area bg-white" id="logo-upload-area"
+                                style="border: 2px dashed #dee2e6; border-radius: 8px; padding: 40px 20px; text-align: center; transition: all 0.3s ease; background-color: #ffffff; position: relative; min-height: 200px; display: flex; flex-direction: column; justify-content: center;">
+                                <div class="file-upload-content" style="transition: opacity 0.3s ease;">
+                                    <i class="material-symbols-outlined file-upload-icon"
+                                        style="font-size: 48px; color: #6c757d; margin-bottom: 16px;">cloud_upload</i>
+                                    <h5 class="file-upload-title"
+                                        style="font-size: 18px; font-weight: 500; color: #212529; margin-bottom: 8px;">
+                                        Drag and drop an image or Browse</h5>
+                                    <p class="file-upload-subtitle"
+                                        style="font-size: 14px; color: #6c757d; margin-bottom: 0;">JPG, PNG - Max 5MB
+                                    </p>
+                                    <input type="file" class="file-upload-input" name="logo" accept="image/*"
+                                        id="logo-input"
+                                        style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; opacity: 0; cursor: pointer;">
+                                </div>
+                                <div class="file-preview" id="logo-preview" style="margin-top: 16px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Buttons -->
+                <div class="mt-4 pt-3 border-top"
+                    style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #e9ecef !important;">
+                    <div class="d-flex gap-2" style="display: flex; gap: 8px; width: 100%;">
+                        <button type="button"
+                            class="btn btn-outline-secondary d-flex align-items-center justify-content-center gap-2 py-3 flex-grow-1"
+                            onclick="window.history.back()"
+                            style="border-radius: 6px; font-weight: 500; border: 1px solid #6c757d; background-color: white; color: #6c757d; padding: 12px 24px; font-size: 14px; min-height: 48px; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; flex-grow: 1;">
+                            <i class="material-symbols-outlined fs-16" style="font-size: 16px;">arrow_back</i>
+                            Cancel
+                        </button>
+                        <button type="reset"
+                            class="btn btn-outline-danger d-flex align-items-center justify-content-center gap-2 py-3 flex-grow-1"
+                            style="border-radius: 6px; font-weight: 500; border: 1px solid #dc3545; background-color: white; color: #dc3545; padding: 12px 24px; font-size: 14px; min-height: 48px; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; flex-grow: 1;">
+                            <i class="material-symbols-outlined fs-16" style="font-size: 16px;">refresh</i>
+                            Reset Form
+                        </button>
+                        <button type="submit" id="submit-btn"
+                            class="btn btn-primary text-white d-flex align-items-center justify-content-center gap-2 py-3 flex-grow-1"
+                            style="border-radius: 6px; font-weight: 500; border: 1px solid #007bff; background-color: #007bff; color: white; padding: 12px 24px; font-size: 14px; min-height: 48px; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; flex-grow: 1;">
+                            <i class="material-symbols-outlined fs-16 text-white"
+                                style="font-size: 16px; color: white;">business</i>
+                            {% if company %}Update Company{% else %}Create Company{% endif %}
+                        </button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Initialize file upload for logo
+        const logoUploadArea = document.getElementById('logo-upload-area');
+        if (logoUploadArea) {
+            initializeFileUpload(logoUploadArea);
+        }
+
+        // Initialize file upload functionality for all file upload areas
+        function initializeFileUpload(uploadArea) {
+            const fileInput = uploadArea.querySelector('.file-upload-input');
+            const preview = uploadArea.querySelector('.file-preview');
+            const uploadContent = uploadArea.querySelector('.file-upload-content');
+
+            // File input change
+            fileInput.addEventListener('change', function () {
+                handleFileSelection(this, preview, uploadContent);
+            });
+
+            // Drag and drop functionality
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, preventDefaults, false);
+            });
+
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, highlight, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, unhighlight, false);
+            });
+
+            function highlight() {
+                uploadArea.style.borderColor = '#007bff';
+                uploadArea.style.backgroundColor = 'rgba(0, 123, 255, 0.05)';
+            }
+
+            function unhighlight() {
+                uploadArea.style.borderColor = '#dee2e6';
+                uploadArea.style.backgroundColor = '#ffffff';
+            }
+
+            uploadArea.addEventListener('drop', handleDrop, false);
+
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                fileInput.files = files;
+                handleFileSelection(fileInput, preview, uploadContent);
+            }
+        }
+
+        function handleFileSelection(fileInput, preview, uploadContent) {
+            const file = fileInput.files[0];
+            if (file) {
+                // Check file size (5MB for logo)
+                const maxSize = 5 * 1024 * 1024;
+                if (file.size > maxSize) {
+                    alert(`File is too large. Maximum size is 5MB.`);
+                    fileInput.value = '';
+                    return;
+                }
+
+                // Create preview
+                preview.innerHTML = '';
+
+                const previewItem = document.createElement('div');
+                previewItem.style.cssText = 'display: flex; align-items: center; background: white; border: 1px solid #e9ecef; border-radius: 6px; padding: 12px; margin-bottom: 8px; position: relative;';
+
+                const fileIcon = document.createElement('i');
+                fileIcon.className = 'material-symbols-outlined';
+                fileIcon.style.cssText = 'font-size: 24px; color: #6c757d; margin-right: 12px;';
+
+                // Set icon based on file type
+                if (file.type.startsWith('image/')) {
+                    fileIcon.textContent = 'image';
+                    // For images, create image preview
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        const imgPreview = document.createElement('div');
+                        imgPreview.style.cssText = 'margin-right: 12px;';
+                        imgPreview.innerHTML = `
+                        <img src="${e.target.result}" alt="${file.name}" style="width: 50px; height: 50px; object-fit: contain; border-radius: 4px; border: 1px solid #e9ecef;">
+                    `;
+                        previewItem.insertBefore(imgPreview, previewItem.firstChild);
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    fileIcon.textContent = 'description';
+                }
+
+                const fileInfo = document.createElement('div');
+                fileInfo.style.cssText = 'flex-grow: 1;';
+
+                const fileName = document.createElement('div');
+                fileName.style.cssText = 'font-weight: 500; color: #212529; font-size: 14px; margin-bottom: 4px; word-break: break-word;';
+                fileName.textContent = file.name;
+
+                const fileSize = document.createElement('div');
+                fileSize.style.cssText = 'font-size: 12px; color: #6c757d;';
+                fileSize.textContent = formatFileSize(file.size);
+
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.style.cssText = 'background: none; border: none; color: #6c757d; cursor: pointer; padding: 6px; border-radius: 4px; display: flex; align-items: center; justify-content: center; min-height: auto; transition: all 0.2s ease;';
+                removeBtn.innerHTML = '<i class="material-symbols-outlined" style="font-size: 16px;">close</i>';
+                removeBtn.title = 'Remove file';
+
+                removeBtn.addEventListener('mouseenter', function () {
+                    this.style.backgroundColor = '#f8f9fa';
+                    this.style.color = '#dc3545';
+                    this.style.transform = 'scale(1.1)';
+                });
+
+                removeBtn.addEventListener('mouseleave', function () {
+                    this.style.backgroundColor = 'transparent';
+                    this.style.color = '#6c757d';
+                    this.style.transform = 'scale(1)';
+                });
+
+                removeBtn.addEventListener('click', function () {
+                    fileInput.value = '';
+                    preview.innerHTML = '';
+                    uploadContent.style.display = 'block';
+                });
+
+                fileInfo.appendChild(fileName);
+                fileInfo.appendChild(fileSize);
+
+                previewItem.appendChild(fileIcon);
+                previewItem.appendChild(fileInfo);
+                previewItem.appendChild(removeBtn);
+
+                preview.appendChild(previewItem);
+
+                // Hide the upload content
+                uploadContent.style.display = 'none';
+            }
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Form focus effects
+        const formControls = document.querySelectorAll('.form-control, .form-select, textarea');
+        formControls.forEach(control => {
+            control.addEventListener('focus', function () {
+                this.style.borderColor = '#007bff';
+                this.style.boxShadow = '0 0 0 0.2rem rgba(0, 123, 255, 0.1)';
+            });
+
+            control.addEventListener('blur', function () {
+                this.style.borderColor = '#dee2e6';
+                this.style.boxShadow = 'none';
+            });
+        });
+
+        // Button hover effects
+        const buttons = document.querySelectorAll('.btn');
+        buttons.forEach(button => {
+            button.addEventListener('mouseenter', function () {
+                if (this.classList.contains('btn-primary')) {
+                    this.style.backgroundColor = '#0056b3';
+                    this.style.borderColor = '#0056b3';
+                    this.style.transform = 'translateY(-1px)';
+                } else if (this.classList.contains('btn-outline-secondary')) {
+                    this.style.backgroundColor = '#6c757d';
+                    this.style.borderColor = '#6c757d';
+                    this.style.color = 'white';
+                    this.style.transform = 'translateY(-1px)';
+                } else if (this.classList.contains('btn-outline-danger')) {
+                    this.style.backgroundColor = '#dc3545';
+                    this.style.borderColor = '#dc3545';
+                    this.style.color = 'white';
+                    this.style.transform = 'translateY(-1px)';
+                } else if (this.classList.contains('btn-outline-primary')) {
+                    this.style.backgroundColor = '#007bff';
+                    this.style.borderColor = '#007bff';
+                    this.style.color = 'white';
+                    this.style.transform = 'translateY(-1px)';
+                }
+            });
+
+            button.addEventListener('mouseleave', function () {
+                if (this.classList.contains('btn-primary')) {
+                    this.style.backgroundColor = '#007bff';
+                    this.style.borderColor = '#007bff';
+                    this.style.transform = 'translateY(0)';
+                } else if (this.classList.contains('btn-outline-secondary')) {
+                    this.style.backgroundColor = 'white';
+                    this.style.borderColor = '#6c757d';
+                    this.style.color = '#6c757d';
+                    this.style.transform = 'translateY(0)';
+                } else if (this.classList.contains('btn-outline-danger')) {
+                    this.style.backgroundColor = 'white';
+                    this.style.borderColor = '#dc3545';
+                    this.style.color = '#dc3545';
+                    this.style.transform = 'translateY(0)';
+                } else if (this.classList.contains('btn-outline-primary')) {
+                    this.style.backgroundColor = 'white';
+                    this.style.borderColor = '#007bff';
+                    this.style.color = '#007bff';
+                    this.style.transform = 'translateY(0)';
+                }
+            });
+        });
+
+
+        // Handle form submission spinner
+        const companyForm = document.getElementById('company-form');
+        if (companyForm) {
+            companyForm.addEventListener('submit', function () {
+                const submitBtn = document.getElementById('submit-btn');
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = `
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    Processing...
+                `;
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

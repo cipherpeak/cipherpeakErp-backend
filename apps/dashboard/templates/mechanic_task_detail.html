@@ -1,0 +1,380 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="main-content-container overflow-hidden">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4 mt-1">
+        <div>
+            <h3 class="mb-0 text-dark" style="font-weight: 600; font-size: 1.75rem;">Mechanic Task Details</h3>
+            <p class="text-muted mb-0 mt-1" style="font-size: 0.95rem;">ID: {{ task.id|default:"N/A" }}</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'dashboard-mechanic-task-list' %}"
+                class="btn btn-outline-secondary d-flex align-items-center gap-2"
+                style="border-radius: 8px; font-weight: 500; border: 1px solid; transition: all 0.2s ease; padding: 10px 20px; font-size: 14px; min-height: 44px; display: flex; align-items: center; justify-content: center; background-color: white; border-color: #6c757d; color: #6c757d; text-decoration: none;">
+                <i class="material-symbols-outlined fs-16">arrow_back</i>
+                Back to Tasks
+            </a>
+            <!-- Placeholder for edit button if needed later -->
+            <a href="{% url 'edit-mechanic-task' task.id %}" class="btn btn-primary d-flex align-items-center gap-2"
+                style="border-radius: 8px; font-weight: 500; border: 1px solid; transition: all 0.2s ease; padding: 10px 20px; font-size: 14px; min-height: 44px; display: flex; align-items: center; justify-content: center; background-color: #007bff; border-color: #007bff; color: white !important; text-decoration: none;">
+                <i class="material-symbols-outlined fs-16 text-white">edit</i>
+                Edit Task
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Main Task Information -->
+        <div class="col-lg-8">
+            <!-- Task Overview Card -->
+            <div class="card bg-white rounded-10 border border-white mb-4"
+                style="box-shadow: 0 4px 12px rgba(0,0,0,0.05); background-color: white !important; border-radius: 12px; border: 1px solid #e9ecef; overflow: hidden;">
+                <div class="card-header bg-white border-0"
+                    style="background-color: white !important; padding: 1.5rem 1.5rem 0.75rem;">
+                    <h5 class="card-title mb-0 text-dark"
+                        style="font-weight: 600; font-size: 1.1rem; display: flex; align-items: center;">
+                        <i class="material-symbols-outlined me-2 fs-16 text-primary">info</i>
+                        Task Overview
+                    </h5>
+                </div>
+                <div class="card-body" style="background-color: white !important; padding: 1.5rem;">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-4">
+                                <label class="form-label text-dark fw-medium"
+                                    style="color: #495057; font-weight: 500; font-size: 0.875rem; margin-bottom: 0.5rem; display: block;">Status</label>
+                                <p class="mb-0">
+                                    <span
+                                        class="badge bg-{% if task.status == 'completed' %}success{% elif task.status == 'in_progress' %}warning{% elif task.status == 'not_started' %}secondary{% else %}info{% endif %} bg-opacity-10 text-{% if task.status == 'completed' %}success{% elif task.status == 'in_progress' %}warning{% elif task.status == 'not_started' %}secondary{% else %}info{% endif %} border border-{% if task.status == 'completed' %}success{% elif task.status == 'in_progress' %}warning{% elif task.status == 'not_started' %}secondary{% else %}info{% endif %} border-opacity-25 rounded-pill px-3 py-2"
+                                        style="font-weight: 500; font-size: 0.875rem; padding: 0.5rem 1rem; border-radius: 50px;">
+                                        {{ task.get_status_display }}
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-4">
+                                <label class="form-label text-dark fw-medium"
+                                    style="color: #495057; font-weight: 500; font-size: 0.875rem; margin-bottom: 0.5rem; display: block;">Priority</label>
+                                <p class="mb-0">
+                                    <span
+                                        class="badge bg-{% if task.priority == 'urgent' %}danger{% elif task.priority == 'high' %}warning{% elif task.priority == 'medium' %}info{% else %}secondary{% endif %} bg-opacity-10 text-{% if task.priority == 'urgent' %}danger{% elif task.priority == 'high' %}warning{% elif task.priority == 'medium' %}info{% else %}secondary{% endif %} border border-{% if task.priority == 'urgent' %}danger{% elif task.priority == 'high' %}warning{% elif task.priority == 'medium' %}info{% else %}secondary{% endif %} border-opacity-25 rounded-pill px-3 py-2"
+                                        style="font-weight: 500; font-size: 0.875rem; padding: 0.5rem 1rem; border-radius: 50px;">
+                                        {{ task.get_priority_display }}
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if mechanic.heading %}
+                    <div class="mb-4">
+                        <label class="form-label text-dark fw-medium"
+                            style="color: #495057; font-weight: 500; font-size: 0.875rem; margin-bottom: 0.5rem; display: block;">Heading</label>
+                        <p class="mb-0 text-dark" style="color: #212529; font-weight: 500; font-size: 1.1rem;">{{
+                            mechanic.heading }}</p>
+                    </div>
+                    {% endif %}
+
+                    {% if mechanic.job_description %}
+                    <div class="mb-4">
+                        <label class="form-label text-dark fw-medium"
+                            style="color: #495057; font-weight: 500; font-size: 0.875rem; margin-bottom: 0.5rem; display: block;">Job
+                            Description</label>
+                        <p class="mb-0 text-dark"
+                            style="color: #212529; line-height: 1.6; background-color: #f8f9fa; padding: 1rem; border-radius: 8px; border-left: 4px solid #007bff;">
+                            {{ mechanic.job_description|default:"No description provided" }}
+                        </p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Machine Details Card -->
+            <div class="card bg-white rounded-10 border border-white mb-4"
+                style="box-shadow: 0 4px 12px rgba(0,0,0,0.05); background-color: white !important; border-radius: 12px; border: 1px solid #e9ecef; overflow: hidden;">
+                <div class="card-header bg-white border-0"
+                    style="background-color: white !important; padding: 1.5rem 1.5rem 0.75rem;">
+                    <h5 class="card-title mb-0 text-dark"
+                        style="font-weight: 600; font-size: 1.1rem; display: flex; align-items: center;">
+                        <i class="material-symbols-outlined me-2 fs-16 text-primary">precision_manufacturing</i>
+                        Machine & Site Details
+                    </h5>
+                </div>
+                <div class="card-body" style="background-color: white !important; padding: 1.5rem;">
+                    <div class="row">
+                        {% if mechanic.Site_number %}
+                        <div class="col-md-6">
+                            <div class="mb-4">
+                                <label class="form-label text-dark fw-medium"
+                                    style="color: #495057; font-weight: 500; font-size: 0.875rem; margin-bottom: 0.5rem; display: block;">Site
+                                    Number</label>
+                                <p class="mb-0 text-dark" style="color: #212529; font-weight: 500;">
+                                    {{ mechanic.Site_number }}</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if mechanic.bay_number %}
+                        <div class="col-md-6">
+                            <div class="mb-4">
+                                <label class="form-label text-dark fw-medium"
+                                    style="color: #495057; font-weight: 500; font-size: 0.875rem; margin-bottom: 0.5rem; display: block;">Bay
+                                    Number</label>
+                                <p class="mb-0 text-dark" style="color: #212529; font-weight: 500;">{{ mechanic.bay_number }}</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if mechanic.Machine_type %}
+                        <div class="col-md-6">
+                            <div class="mb-4">
+                                <label class="form-label text-dark fw-medium"
+                                    style="color: #495057; font-weight: 500; font-size: 0.875rem; margin-bottom: 0.5rem; display: block;">Machine
+                                    Type</label>
+                                <p class="mb-0 text-dark" style="color: #212529; font-weight: 500;">{{ mechanic.Machine_type }}</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if mechanic.Machine_serial_number %}
+                        <div class="col-md-6">
+                            <div class="mb-4">
+                                <label class="form-label text-dark fw-medium"
+                                    style="color: #495057; font-weight: 500; font-size: 0.875rem; margin-bottom: 0.5rem; display: block;">Serial
+                                    Number</label>
+                                <p class="mb-0 text-dark" style="color: #212529; font-weight: 500;">{{ mechanic.Machine_serial_number }}</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Spare Parts Details Card -->
+            {% if mechanic.spare_part_details or mechanic.part_items %}
+            <div class="card bg-white rounded-10 border border-white mb-4"
+                style="box-shadow: 0 4px 12px rgba(0,0,0,0.05); background-color: white !important; border-radius: 12px; border: 1px solid #e9ecef; overflow: hidden;">
+                <div class="card-header bg-white border-0"
+                    style="background-color: white !important; padding: 1.5rem 1.5rem 0.75rem;">
+                    <h5 class="card-title mb-0 text-dark"
+                        style="font-weight: 600; font-size: 1.1rem; display: flex; align-items: center;">
+                        <i class="material-symbols-outlined me-2 fs-16 text-primary">settings</i>
+                        Spare Parts & Items
+                    </h5>
+                </div>
+                <div class="card-body" style="background-color: white !important; padding: 1.5rem;">
+                    {% if mechanic.spare_part_details %}
+                    <div class="mb-4">
+                        <label class="form-label text-dark fw-medium"
+                            style="color: #495057; font-weight: 500; font-size: 0.875rem; margin-bottom: 0.5rem; display: block;">Spare
+                            Part Details</label>
+                        <p class="mb-0 text-dark" style="color: #212529; line-height: 1.5;">{{ mechanic.spare_part_details }}</p>
+                    </div>
+                    {% endif %}
+
+                    {% if mechanic.part_items.all %}
+                    <div class="mb-3">
+                        <label class="form-label text-dark fw-medium"
+                            style="color: #495057; font-weight: 500; font-size: 0.875rem; margin-bottom: 0.75rem; display: block;">Part Items</label>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover" style="border-radius: 8px; overflow: hidden;">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th style="font-weight: 600; font-size: 0.875rem; color: #495057; padding: 0.75rem; background-color: #f8f9fa;">Part Number</th>
+                                        <th style="font-weight: 600; font-size: 0.875rem; color: #495057; padding: 0.75rem; background-color: #f8f9fa;">Item</th>
+                                        <th style="font-weight: 600; font-size: 0.875rem; color: #495057; padding: 0.75rem; background-color: #f8f9fa; text-align: center; width: 100px;">Quantity</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in mechanic.part_items.all %}
+                                    <tr>
+                                        <td style="padding: 0.75rem; color: #212529; font-weight: 500;">{{ item.part_number.part_number|default:"-" }}</td>
+                                        <td style="padding: 0.75rem; color: #212529;">{{ item.part_number.item|default:"-" }}</td>
+                                        <td style="padding: 0.75rem; text-align: center; color: #212529; font-weight: 500;">{{ item.quantity|default:"-" }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Completion Details Card -->
+            {% if mechanic.completed_at %}
+            <div class="card bg-white rounded-10 border border-white mb-4"
+                style="box-shadow: 0 4px 12px rgba(0,0,0,0.05); background-color: white !important; border-radius: 12px; border: 1px solid #e9ecef; overflow: hidden;">
+                <div class="card-header bg-white border-0"
+                    style="background-color: white !important; padding: 1.5rem 1.5rem 0.75rem;">
+                    <h5 class="card-title mb-0 text-dark"
+                        style="font-weight: 600; font-size: 1.1rem; display: flex; align-items: center;">
+                        <i class="material-symbols-outlined me-2 fs-16 text-primary">task_alt</i>
+                        Completion Details
+                    </h5>
+                </div>
+                <div class="card-body" style="background-color: white !important; padding: 1.5rem;">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-4">
+                                <label class="form-label text-dark fw-medium"
+                                    style="color: #495057; font-weight: 500; font-size: 0.875rem; margin-bottom: 0.5rem; display: block;">Started
+                                    At</label>
+                                <p class="mb-0 text-dark" style="color: #212529; font-weight: 500;">{{  mechanic.started_at|time:"h:i A"|default:"-" }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-4">
+                                <label class="form-label text-dark fw-medium"
+                                    style="color: #495057; font-weight: 500; font-size: 0.875rem; margin-bottom: 0.5rem; display: block;">Completed
+                                    At</label>
+                                <p class="mb-0 text-dark" style="color: #212529; font-weight: 500;">{{ mechanic.completed_at|date:"M d, Y h:i A" }}</p>
+                            </div>
+                        </div>
+                        {% if mechanic.completion_remarks %}
+                        <div class="col-12">
+                            <div class="mb-4">
+                                <label class="form-label text-dark fw-medium"
+                                    style="color: #495057; font-weight: 500; font-size: 0.875rem; margin-bottom: 0.5rem; display: block;">Remarks</label>
+                                <p class="mb-0 text-dark" style="color: #212529; line-height: 1.5;">{{  mechanic.completion_remarks }}</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    {% if mechanic.completion_image %}
+                    <div class="mt-3">
+                        <label class="form-label text-dark fw-medium"
+                            style="color: #495057; font-weight: 500; font-size: 0.875rem; margin-bottom: 0.5rem; display: block;">Completion
+                            Image</label>
+                        <img src="{{ mechanic.completion_image.url }}" class="img-fluid rounded"
+                            style="border-radius: 8px; border: 1px solid #dee2e6; max-height: 400px; width: auto; object-fit: contain;"
+                            alt="Completion Image">
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Employee Card -->
+            <div class="card bg-white rounded-10 border border-white mb-4"
+                style="box-shadow: 0 4px 12px rgba(0,0,0,0.05); background-color: white !important; border-radius: 12px; border: 1px solid #e9ecef; overflow: hidden;">
+                <div class="card-header bg-white border-0"
+                    style="background-color: white !important; padding: 1.5rem 1.5rem 0.75rem;">
+                    <h5 class="card-title mb-0 text-dark"
+                        style="font-weight: 600; font-size: 1.1rem; display: flex; align-items: center;">
+                        <i class="material-symbols-outlined me-2 fs-16 text-primary">person</i>
+                        Assigned Employee
+                    </h5>
+                </div>
+                <div class="card-body" style="background-color: white !important; padding: 1.5rem;">
+                    <div class="text-center">
+                        {% if task.employee.profile_pic %}
+                        <img src="{{ task.employee.profile_pic.url }}" class="rounded-circle mb-3"
+                            style="width: 100px; height: 100px; object-fit: cover; border: 4px solid #f8f9fa; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"
+                            alt="{{ task.employee.employee_name }}">
+                        {% else %}
+                        <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center mx-auto mb-3"
+                            style="width: 100px; height: 100px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: 4px solid #f8f9fa; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+                            <span class="text-white fw-bold fs-24" style="font-size: 2rem; font-weight: 700;">{{ task.employee.employee_name|default:task.employee.employeeId|first|upper }}</span>
+                        </div>
+                        {% endif %}
+                        <h5 class="text-dark mb-1" style="font-weight: 600; font-size: 1.25rem;">{{ task.employee.employee_name|default:"Not Set" }}</h5>
+                        <p class="text-muted mb-2" style="color: #6c757d; font-size: 0.9rem;">{{ task.employee.employeeId }}</p>
+
+                        <a href="{% url 'employee-details' task.employee.id %}" class="btn btn-outline-primary btn-sm"
+                            style="border-radius: 6px; font-weight: 500; border: 1px solid #007bff; color: #007bff; padding: 0.5rem 1rem; font-size: 0.875rem; transition: all 0.2s ease; text-decoration: none;">
+                            View Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dates Card -->
+            <div class="card bg-white rounded-10 border border-white mb-4"
+                style="box-shadow: 0 4px 12px rgba(0,0,0,0.05); background-color: white !important; border-radius: 12px; border: 1px solid #e9ecef; overflow: hidden;">
+                <div class="card-header bg-white border-0"
+                    style="background-color: white !important; padding: 1.5rem 1.5rem 0.75rem;">
+                    <h5 class="card-title mb-0 text-dark"
+                        style="font-weight: 600; font-size: 1.1rem; display: flex; align-items: center;">
+                        <i class="material-symbols-outlined me-2 fs-16 text-primary">calendar_month</i>
+                        Dates
+                    </h5>
+                </div>
+                <div class="card-body" style="background-color: white !important; padding: 1.5rem;">
+                    <div class="mb-0">
+                        <label class="form-label text-dark fw-medium"
+                            style="color: #495057; font-weight: 500; font-size: 0.875rem; margin-bottom: 0.5rem; display: block;">Created
+                            At</label>
+                        <p class="mb-0 text-dark" style="color: #212529; font-weight: 500;">{{ task.created_at|date:"M d, Y h:i A" }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Hover effects that can't be inline */
+    .btn-outline-secondary:hover {
+        background-color: #6c757d !important;
+        border-color: #6c757d !important;
+        color: white !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 4px 8px rgba(108, 117, 125, 0.2) !important;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3 !important;
+        border-color: #0056b3 !important;
+        color: white !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2) !important;
+    }
+
+    .btn-outline-primary:hover {
+        background-color: #007bff !important;
+        border-color: #007bff !important;
+        color: white !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2) !important;
+    }
+
+    /* Card hover effect */
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    /* Progress bar animation */
+    .progress-bar {
+        transition: width 0.3s ease !important;
+    }
+
+    /* Responsive styles */
+    @media (max-width: 768px) {
+        .btn {
+            padding: 8px 16px !important;
+            font-size: 13px !important;
+            min-height: 40px !important;
+        }
+
+        h3 {
+            font-size: 1.5rem !important;
+        }
+
+        .card-body {
+            padding: 1rem !important;
+        }
+
+        .card-header {
+            padding: 1rem !important;
+        }
+    }
+</style>
+{% endblock %}

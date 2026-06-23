@@ -1,0 +1,1071 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    select,
+    .form-select,
+    option,
+    input,
+    .form-control,
+    textarea {
+        color: #000000 !important;
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    .password-field-wrapper {
+        position: relative;
+    }
+
+    .password-toggle-btn {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #6c757d;
+        transition: color 0.2s ease;
+    }
+
+    .password-toggle-btn:hover {
+        color: #007bff;
+    }
+</style>
+<div class="main-content-container overflow-hidden"
+    style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+    <!-- Header -->
+    <div
+        style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem; margin-top: 0.25rem;">
+        <h3 style="margin-bottom: 0; color: #212529; font-size: 1.5rem; font-weight: 600;">Edit Employee</h3>
+        <div style="display: flex; gap: 0.5rem;">
+            <a href="{% url 'employee-manage' %}"
+                style="display: flex; align-items: center; gap: 0.5rem; background-color: white; border: 1px solid #6c757d; color: #6c757d; border-radius: 6px; font-weight: 500; padding: 12px 24px; font-size: 14px; min-height: 48px; text-decoration: none; transition: all 0.2s ease;">
+                <i class="material-symbols-outlined" style="font-size: 16px;">arrow_back</i>
+                Back to Employees
+            </a>
+        </div>
+    </div>
+
+    <!-- Display Messages -->
+    {% if messages %}
+    <div style="margin-bottom: 1.5rem;">
+        {% for message in messages %}
+        <div role="alert"
+            style="border: none; border-radius: 8px; {% if message.tags == 'success' %}background-color: #d1f2eb; color: #0f5132;{% elif message.tags == 'error' or message.tags == 'danger' %}background-color: #f8d7da; color: #721c24;{% elif message.tags == 'warning' %}background-color: #fff3cd; color: #856404;{% elif message.tags == 'info' %}background-color: #d1ecf1; color: #0c5460;{% endif %} padding: 1rem; margin-bottom: 0.5rem;">
+            <div style="display: flex; align-items: center;">
+                <i class="material-symbols-outlined" style="margin-right: 0.5rem; font-size: 16px;">
+                    {% if message.tags == 'success' %}check_circle{% endif %}
+                    {% if message.tags == 'error' or message.tags == 'danger' %}error{% endif %}
+                    {% if message.tags == 'warning' %}warning{% endif %}
+                    {% if message.tags == 'info' %}info{% endif %}
+                </i>
+                <span style="font-weight: 500;">{{ message }}</span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div
+        style="background-color: white; border-radius: 10px; border: 1px solid white; margin-bottom: 1.5rem; box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);">
+        <div style="padding: 1.5rem;">
+            <form method="POST" enctype="multipart/form-data" action="{% url 'edit-employee' employee.id %}"
+                id="edit-employee-form">
+                {% csrf_token %}
+
+                <!-- Employee Information Section -->
+                <div
+                    style="border-bottom: 1px solid #e9ecef !important; padding-bottom: 1.5rem; margin-bottom: 1.5rem;">
+                    <h5 style="color: #212529; margin-bottom: 1rem; font-size: 1.125rem; font-weight: 500;">
+                        <i class="material-symbols-outlined"
+                            style="margin-right: 0.5rem; font-size: 16px; color: #007bff;">person</i>
+                        Employee Information
+                    </h5>
+                    <div style="display: flex; flex-wrap: wrap; margin-right: -0.75rem; margin-left: -0.75rem;">
+                        <div style="flex: 0 0 50%; max-width: 50%; padding-right: 0.75rem; padding-left: 0.75rem;">
+                            <div style="margin-bottom: 1rem;">
+                                <label
+                                    style="display: block; font-weight: 500; margin-bottom: 8px; color: #212529;">Employee
+                                    ID <span style="color: #dc3545;">*</span></label>
+                                <input type="text" name="employeeId" value="{{ employee.employeeId }}" required
+                                    placeholder="Enter employee ID"
+                                    style="display: block; width: 100%; padding: 10px 12px; font-size: 14px; line-height: 1.5; color: #212529; background-color: #ffffff !important; border: 1px solid #dee2e6; border-radius: 6px;">
+                            </div>
+                        </div>
+                        <div style="flex: 0 0 50%; max-width: 50%; padding-right: 0.75rem; padding-left: 0.75rem;">
+                            <div style="margin-bottom: 1rem;">
+                                <label
+                                    style="display: block; font-weight: 500; margin-bottom: 8px; color: #212529;">Employee
+                                    Name</label>
+                                <input type="text" name="employee_name" value="{{ employee.employee_name }}"
+                                    placeholder="Enter full name"
+                                    style="display: block; width: 100%; padding: 10px 12px; font-size: 14px; line-height: 1.5; color: #212529; background-color: #ffffff !important; border: 1px solid #dee2e6; border-radius: 6px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; flex-wrap: wrap; margin-right: -0.75rem; margin-left: -0.75rem;">
+                        <div style="flex: 0 0 50%; max-width: 50%; padding-right: 0.75rem; padding-left: 0.75rem;">
+                            <div style="margin-bottom: 1rem;">
+                                <label
+                                    style="display: block; font-weight: 500; margin-bottom: 8px; color: #212529;">Role</label>
+                                <select name="role"
+                                    style="display: block; width: 100%; padding: 10px 12px; font-size: 14px; line-height: 1.5; color: #212529; background-color: #ffffff !important; border: 1px solid #dee2e6; border-radius: 6px; appearance: none; background-image: url('data:image/svg+xml;utf8,<svg fill=\"%23212529\" height=\"24\" viewBox=\"0 0 24 24\" width=\"24\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M7 10l5 5 5-5z\" /></svg>'); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px;">
+                                    {% for value, label in role_choices %}
+                                        {% if employee.role == value %}
+                                            <option value="{{ value }}" selected>{{ label }}</option>
+                                        {% else %}
+                                            <option value="{{ value }}">{{ label }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div style="flex: 0 0 50%; max-width: 50%; padding-right: 0.75rem; padding-left: 0.75rem;">
+                            <div style="margin-bottom: 1rem;">
+                                <label
+                                    style="display: block; font-weight: 500; margin-bottom: 8px; color: #212529;">Employee
+                                    Type</label>
+                                <select name="employee_type"
+                                    style="display: block; width: 100%; padding: 10px 12px; font-size: 14px; line-height: 1.5; color: #212529; background-color: #ffffff !important; border: 1px solid #dee2e6; border-radius: 6px; appearance: none; background-image: url('data:image/svg+xml;utf8,<svg fill=\"%23212529\" height=\"24\" viewBox=\"0 0 24 24\" width=\"24\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M7 10l5 5 5-5z\" /></svg>'); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px;">
+                                    {% for value, label in employee_type_choices %}
+                                        {% if employee.employee_type == value %}
+                                            <option value="{{ value }}" selected>{{ label }}</option>
+                                        {% else %}
+                                            <option value="{{ value }}">{{ label }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; flex-wrap: wrap; margin-right: -0.75rem; margin-left: -0.75rem;">
+                        <div style="flex: 0 0 50%; max-width: 50%; padding-right: 0.75rem; padding-left: 0.75rem;">
+                            <div style="margin-bottom: 1rem;">
+                                <label
+                                    style="display: block; font-weight: 500; margin-bottom: 8px; color: #212529;">Date
+                                    of Joining</label>
+                                <input type="date" name="date_of_joining"
+                                    value="{{ employee.date_joined|date:'Y-m-d' }}"
+                                    style="display: block; width: 100%; padding: 10px 12px; font-size: 14px; line-height: 1.5; color: #212529; background-color: #ffffff !important; border: 1px solid #dee2e6; border-radius: 6px;">
+                            </div>
+                        </div>
+                        <div style="flex: 0 0 50%; max-width: 50%; padding-right: 0.75rem; padding-left: 0.75rem;">
+                            <div style="margin-bottom: 1rem;">
+                                <label
+                                    style="display: block; font-weight: 500; margin-bottom: 8px; color: #212529;">Company</label>
+                                <select name="company"
+                                    style="display: block; width: 100%; padding: 10px 12px; font-size: 14px; line-height: 1.5; color: #212529; background-color: #ffffff !important; border: 1px solid #dee2e6; border-radius: 6px; appearance: none; background-image: url('data:image/svg+xml;utf8,<svg fill=\"%23212529\" height=\"24\" viewBox=\"0 0 24 24\" width=\"24\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M7 10l5 5 5-5z\" /></svg>'); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px;">
+                                    <option value="">Select Company</option>
+                                    {% for company in companies %}
+                                        {% if employee.company.id == company.id %}
+                                            <option value="{{ company.id }}" selected>
+                                                {{ company.company_name }}
+                                            </option>
+                                        {% else %}
+                                            <option value="{{ company.id }}">
+                                                {{ company.company_name }}
+                                            </option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; flex-wrap: wrap; margin-right: -0.75rem; margin-left: -0.75rem;">
+                        <div style="flex: 0 0 50%; max-width: 50%; padding-right: 0.75rem; padding-left: 0.75rem;">
+                            <div style="margin-bottom: 1rem;">
+                                <label
+                                    style="display: block; font-weight: 500; margin-bottom: 8px; color: #212529;">Password</label>
+                                <div style="display: flex; width: 100%;">
+                                    <div class="password-field-wrapper" style="position: relative; flex: 1;">
+                                        <input type="password" value="********" readonly id="password-field"
+                                            style="display: block; width: 100%; padding: 10px 40px 10px 12px; font-size: 14px; line-height: 1.5; color: #212529; background-color: #ffffff !important; border: 1px solid #dee2e6; border-radius: 6px 0 0 6px; border-right: none;">
+                                        <button type="button" class="password-toggle-btn" id="toggle-password"
+                                            style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; padding: 5px; display: flex; align-items: center; justify-content: center; color: #6c757d; transition: color 0.2s ease;">
+                                            <i class="material-symbols-outlined" style="font-size: 20px;"
+                                                id="password-icon">visibility</i>
+                                        </button>
+                                    </div>
+                                    <button type="button" id="forgot-password-btn" data-employee-id="{{ employee.id }}"
+                                        style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; background-color: #f59e0b; border: 1px solid #f59e0b; color: white; border-radius: 0 6px 6px 0; font-weight: 500; padding: 10px 16px; font-size: 14px; min-height: 46px; cursor: pointer; transition: all 0.2s ease;">
+                                        <i class="material-symbols-outlined" style="font-size: 16px;">lock_reset</i>
+                                        Reset
+                                    </button>
+                                </div>
+                                <small style="color: #6c757d; display: block; margin-top: 4px;">Click "Reset" to
+                                    generate a new password</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Employee Status Section -->
+                    <div style="margin-bottom: 1rem;">
+                        <label style="display: block; font-weight: 500; margin-bottom: 12px; color: #212529;">Employee
+                            Status</label>
+                        <div style="display: flex; gap: 1rem;">
+                            <div>
+                                <input class="status-radio" type="radio" name="is_active" id="active_yes" value="true"
+                                    {% if employee.is_active %}checked{% endif %} style="display: none;">
+                                <label for="active_yes" class="status-label"
+                                    style="cursor: pointer; padding: 8px 16px; border: 2px solid {% if employee.is_active %}#28a745{% else %}#e9ecef{% endif %}; border-radius: 6px; transition: all 0.3s ease; display: flex; align-items: center; gap: 0.5rem; color: {% if employee.is_active %}#28a745{% else %}#6c757d{% endif %}; font-weight: 500; background-color: {% if employee.is_active %}rgba(40, 167, 69, 0.1){% else %}white{% endif %};">
+                                    <i class="material-symbols-outlined check-icon"
+                                        style="font-size: 20px;">check_circle</i>
+                                    Active
+                                </label>
+                            </div>
+                            <div>
+                                <input class="status-radio" type="radio" name="is_active" id="active_no" value="false"
+                                    {% if not employee.is_active %}checked{% endif %} style="display: none;">
+                                <label for="active_no" class="status-label"
+                                    style="cursor: pointer; padding: 8px 16px; border: 2px solid {% if not employee.is_active %}#dc3545{% else %}#e9ecef{% endif %}; border-radius: 6px; transition: all 0.3s ease; display: flex; align-items: center; gap: 0.5rem; color: {% if not employee.is_active %}#dc3545{% else %}#6c757d{% endif %}; font-weight: 500; background-color: {% if not employee.is_active %}rgba(220, 53, 69, 0.1){% else %}white{% endif %};">
+                                    <i class="material-symbols-outlined check-icon" style="font-size: 20px;">cancel</i>
+                                    Inactive
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Personal Information Section -->
+                <div
+                    style="border-bottom: 1px solid #e9ecef !important; padding-bottom: 1.5rem; margin-bottom: 1.5rem;">
+                    <h5 style="color: #212529; margin-bottom: 1rem; font-size: 1.125rem; font-weight: 500;">
+                        <i class="material-symbols-outlined"
+                            style="margin-right: 0.5rem; font-size: 16px; color: #007bff;">contact_page</i>
+                        Personal Details
+                    </h5>
+                    <div style="display: flex; flex-wrap: wrap; margin-right: -0.75rem; margin-left: -0.75rem;">
+                        <div style="flex: 0 0 50%; max-width: 50%; padding-right: 0.75rem; padding-left: 0.75rem;">
+                            <div style="margin-bottom: 1rem;">
+                                <label
+                                    style="display: block; font-weight: 500; margin-bottom: 8px; color: #212529;">Mobile
+                                    Number</label>
+                                <input type="tel" name="mobile_number" value="{{ employee.mobile_number }}"
+                                    placeholder="Enter mobile number"
+                                    style="display: block; width: 100%; padding: 10px 12px; font-size: 14px; line-height: 1.5; color: #212529; background-color: #ffffff !important; border: 1px solid #dee2e6; border-radius: 6px;">
+                            </div>
+                        </div>
+                        <div style="flex: 0 0 50%; max-width: 50%; padding-right: 0.75rem; padding-left: 0.75rem;">
+                            <div style="margin-bottom: 1rem;">
+                                <label
+                                    style="display: block; font-weight: 500; margin-bottom: 8px; color: #212529;">Email
+                                    Address</label>
+                                <input type="email" name="email" value="{{ employee.email }}"
+                                    placeholder="Enter email address"
+                                    style="display: block; width: 100%; padding: 10px 12px; font-size: 14px; line-height: 1.5; color: #212529; background-color: #ffffff !important; border: 1px solid #dee2e6; border-radius: 6px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; flex-wrap: wrap; margin-right: -0.75rem; margin-left: -0.75rem;">
+                        <div style="flex: 0 0 50%; max-width: 50%; padding-right: 0.75rem; padding-left: 0.75rem;">
+                            <div style="margin-bottom: 1rem;">
+                                <label
+                                    style="display: block; font-weight: 500; margin-bottom: 8px; color: #212529;">Date
+                                    of Birth</label>
+                                <input type="date" name="date_of_birth"
+                                    value="{{ employee.date_of_birth|date:'Y-m-d' }}"
+                                    style="display: block; width: 100%; padding: 10px 12px; font-size: 14px; line-height: 1.5; color: #212529; background-color: #ffffff !important; border: 1px solid #dee2e6; border-radius: 6px;">
+                            </div>
+                        </div>
+                        <div style="flex: 0 0 50%; max-width: 50%; padding-right: 0.75rem; padding-left: 0.75rem;">
+                            <div style="margin-bottom: 1rem;">
+                                <label
+                                    style="display: block; font-weight: 500; margin-bottom: 8px; color: #212529;">Nationality</label>
+                                <input type="text" name="nationality" value="{{ employee.nationality }}"
+                                    placeholder="Enter nationality"
+                                    style="display: block; width: 100%; padding: 10px 12px; font-size: 14px; line-height: 1.5; color: #212529; background-color: #ffffff !important; border: 1px solid #dee2e6; border-radius: 6px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 1rem;">
+                        <label style="display: block; font-weight: 500; margin-bottom: 8px; color: #212529;">Home
+                            Address</label>
+                        <textarea name="home_address" rows="3" placeholder="Enter complete address"
+                            style="display: block; width: 100%; padding: 10px 12px; font-size: 14px; line-height: 1.5; color: #212529; background-color: #ffffff !important; border: 1px solid #dee2e6; border-radius: 6px; resize: vertical; min-height: 120px;">{{ employee.home_address }}</textarea>
+                    </div>
+                </div>
+
+                <!-- Emergency Contact Section -->
+                <div
+                    style="border-bottom: 1px solid #e9ecef !important; padding-bottom: 1.5rem; margin-bottom: 1.5rem;">
+                    <h5 style="color: #212529; margin-bottom: 1rem; font-size: 1.125rem; font-weight: 500;">
+                        <i class="material-symbols-outlined"
+                            style="margin-right: 0.5rem; font-size: 16px; color: #007bff;">emergency</i>
+                        Emergency Contact
+                    </h5>
+                    <div style="display: flex; flex-wrap: wrap; margin-right: -0.75rem; margin-left: -0.75rem;">
+                        <div
+                            style="flex: 0 0 33.333333%; max-width: 33.333333%; padding-right: 0.75rem; padding-left: 0.75rem;">
+                            <div style="margin-bottom: 1rem;">
+                                <label
+                                    style="display: block; font-weight: 500; margin-bottom: 8px; color: #212529;">Contact
+                                    Name</label>
+                                <input type="text" name="emergency_contact_name"
+                                    value="{{ employee.emergency_contact_name }}" placeholder="Enter contact name"
+                                    style="display: block; width: 100%; padding: 10px 12px; font-size: 14px; line-height: 1.5; color: #212529; background-color: #ffffff !important; border: 1px solid #dee2e6; border-radius: 6px;">
+                            </div>
+                        </div>
+                        <div
+                            style="flex: 0 0 33.333333%; max-width: 33.333333%; padding-right: 0.75rem; padding-left: 0.75rem;">
+                            <div style="margin-bottom: 1rem;">
+                                <label
+                                    style="display: block; font-weight: 500; margin-bottom: 8px; color: #212529;">Contact
+                                    Number</label>
+                                <input type="tel" name="emergency_contact_number"
+                                    value="{{ employee.emergency_contact_number }}" placeholder="Enter contact number"
+                                    style="display: block; width: 100%; padding: 10px 12px; font-size: 14px; line-height: 1.5; color: #212529; background-color: #ffffff !important; border: 1px solid #dee2e6; border-radius: 6px;">
+                            </div>
+                        </div>
+                        <div
+                            style="flex: 0 0 33.333333%; max-width: 33.333333%; padding-right: 0.75rem; padding-left: 0.75rem;">
+                            <div style="margin-bottom: 1rem;">
+                                <label
+                                    style="display: block; font-weight: 500; margin-bottom: 8px; color: #212529;">Relation</label>
+                                <select name="emergency_contact_relation"
+                                    style="display: block; width: 100%; padding: 10px 12px; font-size: 14px; line-height: 1.5; color: #212529; background-color: #ffffff !important; border: 1px solid #dee2e6; border-radius: 6px; appearance: none; background-image: url('data:image/svg+xml;utf8,<svg fill=\"%23212529\" height=\"24\" viewBox=\"0 0 24 24\" width=\"24\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M7 10l5 5 5-5z\" /></svg>'); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px;">
+                                    <option value="">Select Relation</option>
+                                    {% for value, label in relation_choices %}
+                                        {% if employee.emergency_contact_relation == value %}
+                                            <option value="{{ value }}" selected>{{ label }}</option>
+                                        {% else %}
+                                            <option value="{{ value }}">{{ label }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile Picture Section -->
+                <div
+                    style="border-bottom: 1px solid #e9ecef !important; padding-bottom: 1.5rem; margin-bottom: 1.5rem;">
+                    <h5 style="color: #212529; margin-bottom: 1rem; font-size: 1.125rem; font-weight: 500;">
+                        <i class="material-symbols-outlined"
+                            style="margin-right: 0.5rem; font-size: 16px; color: #007bff;">image</i>
+                        Profile Picture
+                    </h5>
+                    <div style="margin-bottom: 1rem;">
+                        <label style="display: block; font-weight: 500; margin-bottom: 8px; color: #212529;">
+                            {% if employee.profile_pic %}
+                            Update Profile Photo
+                            {% else %}
+                            Upload Profile Photo
+                            {% endif %}
+                        </label>
+                        <div style="margin-top: 8px;">
+                            <div id="profile-pic-upload-area"
+                                style="border: 2px dashed #dee2e6; border-radius: 8px; padding: 40px 20px; text-align: center; transition: all 0.3s ease; background-color: #ffffff; position: relative; min-height: 200px; display: flex; flex-direction: column; justify-content: center;">
+                                <div class="file-upload-content" style="transition: opacity 0.3s ease;">
+                                    {% if employee.profile_pic %}
+                                    <div style="text-align: center; margin-bottom: 1rem;">
+                                        <img src="{{ employee.profile_pic.url }}"
+                                            style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; border: 3px solid #e9ecef;"
+                                            alt="Current Profile">
+                                        <p style="color: #198754; margin-top: 0.5rem;">Current Profile Picture</p>
+                                    </div>
+                                    {% else %}
+                                    <i class="material-symbols-outlined"
+                                        style="font-size: 48px; color: #6c757d; margin-bottom: 16px;">cloud_upload</i>
+                                    <h5 style="font-size: 18px; font-weight: 500; color: #212529; margin-bottom: 8px;">
+                                        Drag and drop an image or Browse</h5>
+                                    <p style="font-size: 14px; color: #6c757d; margin-bottom: 0;">JPG, PNG or GIF - Max
+                                        5MB</p>
+                                    {% endif %}
+                                    <input type="file" class="file-upload-input" name="profile_pic" accept="image/*"
+                                        id="profile-pic-input"
+                                        style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; opacity: 0; cursor: pointer;">
+                                </div>
+                                <div class="file-preview" id="profile-pic-preview" style="margin-top: 16px;"></div>
+                            </div>
+                        </div>
+                        {% if employee.profile_pic %}
+                        <small style="color: #6c757d; display: block; margin-top: 4px;">Upload new image to replace
+                            current one</small>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Visa & Document Details Section -->
+                <div
+                    style="border-bottom: 1px solid #e9ecef !important; padding-bottom: 1.5rem; margin-bottom: 1.5rem;">
+                    <h5 style="color: #212529; margin-bottom: 1rem; font-size: 1.125rem; font-weight: 500;">
+                        <i class="material-symbols-outlined"
+                            style="margin-right: 0.5rem; font-size: 16px; color: #007bff;">description</i>
+                        Visa & Document Details
+                    </h5>
+
+                    <!-- Visa Information -->
+                    <div style="display: flex; flex-wrap: wrap; margin-right: -0.75rem; margin-left: -0.75rem;">
+                        <div style="flex: 0 0 50%; max-width: 50%; padding-right: 0.75rem; padding-left: 0.75rem;">
+                            <div style="margin-bottom: 1rem;">
+                                <label
+                                    style="display: block; font-weight: 500; margin-bottom: 8px; color: #212529;">Visa
+                                    Expiry Date</label>
+                                <input type="date" name="visa_expiry_date"
+                                    value="{{ visa_details.visa_expiry_date|date:'Y-m-d' }}"
+                                    style="display: block; width: 100%; padding: 10px 12px; font-size: 14px; line-height: 1.5; color: #212529; background-color: #ffffff !important; border: 1px solid #dee2e6; border-radius: 6px;">
+                            </div>
+                        </div>
+                        <div style="flex: 0 0 50%; max-width: 50%; padding-right: 0.75rem; padding-left: 0.75rem;">
+                            <div style="margin-bottom: 1rem;">
+                                <label
+                                    style="display: block; font-weight: 500; margin-bottom: 8px; color: #212529;">Passport
+                                    Number</label>
+                                <input type="text" name="passport_number"
+                                    value="{{ visa_details.passport_number|default:'' }}"
+                                    placeholder="Enter passport number"
+                                    style="display: block; width: 100%; padding: 10px 12px; font-size: 14px; line-height: 1.5; color: #212529; background-color: #ffffff !important; border: 1px solid #dee2e6; border-radius: 6px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Passport Information -->
+                    <div style="display: flex; flex-wrap: wrap; margin-right: -0.75rem; margin-left: -0.75rem;">
+                        <div style="flex: 0 0 50%; max-width: 50%; padding-right: 0.75rem; padding-left: 0.75rem;">
+                            <div style="margin-bottom: 1rem;">
+                                <label
+                                    style="display: block; font-weight: 500; margin-bottom: 8px; color: #212529;">Passport
+                                    Expiry Date</label>
+                                <input type="date" name="passport_expiry_date"
+                                    value="{{ visa_details.passport_expiry_date|date:'Y-m-d' }}"
+                                    style="display: block; width: 100%; padding: 10px 12px; font-size: 14px; line-height: 1.5; color: #212529; background-color: #ffffff !important; border: 1px solid #dee2e6; border-radius: 6px;">
+                            </div>
+                        </div>
+                        <div style="flex: 0 0 50%; max-width: 50%; padding-right: 0.75rem; padding-left: 0.75rem;">
+                            <div style="margin-bottom: 1rem;">
+                                <label
+                                    style="display: block; font-weight: 500; margin-bottom: 8px; color: #212529;">Emirates
+                                    ID Number</label>
+                                <input type="text" name="emirates_id_number"
+                                    value="{{ visa_details.emirates_id_number|default:'' }}"
+                                    placeholder="Enter Emirates ID"
+                                    style="display: block; width: 100%; padding: 10px 12px; font-size: 14px; line-height: 1.5; color: #212529; background-color: #ffffff !important; border: 1px solid #dee2e6; border-radius: 6px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Emirates ID -->
+                    <div style="display: flex; flex-wrap: wrap; margin-right: -0.75rem; margin-left: -0.75rem;">
+                        <div style="flex: 0 0 50%; max-width: 50%; padding-right: 0.75rem; padding-left: 0.75rem;">
+                            <div style="margin-bottom: 1rem;">
+                                <label
+                                    style="display: block; font-weight: 500; margin-bottom: 8px; color: #212529;">Emirates
+                                    ID Expiry</label>
+                                <input type="date" name="emirates_id_expiry"
+                                    value="{{ visa_details.emirates_id_expiry|date:'Y-m-d' }}"
+                                    style="display: block; width: 100%; padding: 10px 12px; font-size: 14px; line-height: 1.5; color: #212529; background-color: #ffffff !important; border: 1px solid #dee2e6; border-radius: 6px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Existing Documents -->
+                    {% if visa_details and visa_details.documents.all %}
+                    <div style="margin-top: 1.5rem;">
+                        <h6 style="color: #212529; margin-bottom: 1rem; font-size: 1rem; font-weight: 500;">Existing
+                            Documents</h6>
+                        <div
+                            style="display: flex; flex-wrap: wrap; margin-right: -0.75rem; margin-left: -0.75rem; gap: 0.75rem;">
+                            {% for document in visa_details.documents.all %}
+                            <div
+                                style="flex: 0 0 calc(33.333% - 0.75rem); max-width: calc(33.333% - 0.75rem); padding-right: 0; padding-left: 0;">
+                                <div
+                                    style="border: 1px solid #dee2e6; border-radius: 8px; padding: 0.75rem; background-color: #ffffff; transition: transform 0.2s ease;">
+                                    <div style="display: flex; align-items: center; margin-bottom: 0.75rem;">
+                                        <i class="material-symbols-outlined"
+                                            style="color: #007bff; margin-right: 0.5rem; font-size: 18px;">
+                                            {% if document.document_file.name|lower|slice:'-4:' == '.pdf' %}picture_as_pdf
+                                            {% elif document.document_file.name|lower|slice:'-4:' in '.jpg,.jpeg,.png' %}image
+                                            {% else %}description{% endif %}
+                                        </i>
+                                        <span style="font-weight: 600; color: #212529;">{{document.get_document_type_display }}</span>
+                                    </div>
+                                    <div style="display: flex; gap: 0.5rem;">
+                                        <a href="{{ document.document_file.url }}" target="_blank"
+                                            style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; background-color: white; border: 1px solid #007bff; color: #007bff; border-radius: 6px; font-weight: 500; padding: 8px 12px; font-size: 14px; text-decoration: none; width: 100%; transition: all 0.2s ease;">
+                                            <i class="material-symbols-outlined" style="font-size: 16px;">visibility</i>
+                                            View
+                                        </a>
+                                        <a href="{{ document.document_file.url }}" download
+                                            style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; background-color: white; border: 1px solid #198754; color: #198754; border-radius: 6px; font-weight: 500; padding: 8px 12px; font-size: 14px; text-decoration: none; width: 100%; transition: all 0.2s ease;">
+                                            <i class="material-symbols-outlined" style="font-size: 16px;">download</i>
+                                            Download
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Add New Documents -->
+                    <div style="margin-top: 1.5rem;">
+                        <h6 style="color: #212529; margin-bottom: 1rem; font-size: 1rem; font-weight: 500;">Add New
+                            Documents</h6>
+                        <div style="display: flex; flex-wrap: wrap; margin-right: -0.75rem; margin-left: -0.75rem; gap: 0.75rem;"
+                            id="documents-container">
+                            <!-- First document field -->
+                            <div class="document-row"
+                                style="flex: 0 0 calc(50% - 0.75rem); max-width: calc(50% - 0.75rem); padding-right: 0; padding-left: 0;">
+                                <div
+                                    style="border: 1px solid #dee2e6; border-radius: 8px; padding: 0.75rem; background-color: #ffffff;">
+                                    <div style="margin-bottom: 1rem;">
+                                        <label
+                                            style="display: block; font-weight: 500; margin-bottom: 8px; color: #212529;">Document
+                                            Type</label>
+                                        <select name="document_types[]"
+                                            style="display: block; width: 100%; padding: 10px 12px; font-size: 14px; line-height: 1.5; color: #212529; background-color: #ffffff !important; border: 1px solid #dee2e6; border-radius: 6px; appearance: none; background-image: url('data:image/svg+xml;utf8,<svg fill=\"%23212529\" height=\"24\" viewBox=\"0 0 24 24\" width=\"24\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M7 10l5 5 5-5z\" /></svg>'); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px;">
+                                            <option value="">Select Document Type</option>
+                                            {% for value, label in document_choices %}
+                                            <option value="{{ value }}">{{ label }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+
+                                    <div style="margin-bottom: 0.5rem;">
+                                        <label
+                                            style="display: block; font-weight: 500; margin-bottom: 8px; color: #212529;">Upload
+                                            File</label>
+                                        <div style="margin-top: 8px;">
+                                            <div class="document-upload-area"
+                                                style="border: 2px dashed #dee2e6; border-radius: 8px; padding: 40px 20px; text-align: center; transition: all 0.3s ease; background-color: #ffffff; position: relative; min-height: 150px; display: flex; flex-direction: column; justify-content: center;">
+                                                <div class="file-upload-content" style="transition: opacity 0.3s ease;">
+                                                    <i class="material-symbols-outlined"
+                                                        style="font-size: 36px; color: #6c757d; margin-bottom: 12px;">cloud_upload</i>
+                                                    <h5
+                                                        style="font-size: 16px; font-weight: 500; color: #212529; margin-bottom: 4px;">
+                                                        Drag and drop a file or Browse</h5>
+                                                    <p style="font-size: 12px; color: #6c757d; margin-bottom: 0;">PDF,
+                                                        JPG, PNG up to 10MB</p>
+                                                    <input type="file" class="file-upload-input" name="document_files_0"
+                                                        accept=".pdf,.jpg,.jpeg,.png" multiple
+                                                        style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; opacity: 0; cursor: pointer;">
+                                                </div>
+                                                <div class="file-preview"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Add Document Button -->
+                        <div
+                            style="display: flex; flex-wrap: wrap; margin-right: -0.75rem; margin-left: -0.75rem; margin-top: 0.75rem;">
+                            <div
+                                style="flex: 0 0 100%; max-width: 100%; padding-right: 0.75rem; padding-left: 0.75rem;">
+                                <button type="button" id="add-document"
+                                    style="display: flex; align-items: center; gap: 0.5rem; background-color: white; border: 1px solid #007bff; color: #007bff; border-radius: 6px; font-weight: 500; padding: 10px 16px; font-size: 14px; cursor: pointer; transition: all 0.2s ease;">
+                                    <i class="material-symbols-outlined"
+                                        style="font-size: 16px; margin-right: 0.5rem;">add</i> Add Another Document
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Buttons with Spinner -->
+                <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #e9ecef !important;">
+                    <div style="display: flex; flex-wrap: wrap; margin-right: -0.5rem; margin-left: -0.5rem;">
+                        <div
+                            style="flex: 0 0 33.333333%; max-width: 33.333333%; padding-right: 0.5rem; padding-left: 0.5rem;">
+                            <a href="{% url 'employee-manage' %}"
+                                style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; background-color: white; border: 1px solid #6c757d; color: #6c757d; border-radius: 6px; font-weight: 500; padding: 12px 24px; font-size: 14px; min-height: 48px; width: 100%; text-decoration: none; transition: all 0.2s ease;">
+                                <i class="material-symbols-outlined" style="font-size: 16px;">arrow_back</i>
+                                Cancel
+                            </a>
+                        </div>
+                        <div
+                            style="flex: 0 0 33.333333%; max-width: 33.333333%; padding-right: 0.5rem; padding-left: 0.5rem;">
+                            <button type="reset"
+                                style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; background-color: white; border: 1px solid #dc3545; color: #dc3545; border-radius: 6px; font-weight: 500; padding: 12px 24px; font-size: 14px; min-height: 48px; width: 100%; cursor: pointer; transition: all 0.2s ease;">
+                                <i class="material-symbols-outlined" style="font-size: 16px;">refresh</i>
+                                Reset Changes
+                            </button>
+                        </div>
+                        <div
+                            style="flex: 0 0 33.333333%; max-width: 33.333333%; padding-right: 0.5rem; padding-left: 0.5rem;">
+                            <button type="submit" id="submit-btn"
+                                style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; background-color: #007bff; border: 1px solid #007bff; color: white; border-radius: 6px; font-weight: 500; padding: 12px 24px; font-size: 14px; min-height: 48px; width: 100%; cursor: pointer; transition: all 0.2s ease;">
+                                <span id="submit-btn-content" style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <i class="material-symbols-outlined" style="font-size: 16px; color: white;">save</i>
+                                    Update Employee
+                                </span>
+                                <span id="submit-spinner" class="spinner-border spinner-border-sm"
+                                    style="display: none; width: 16px; height: 16px; border-width: 2px; border-color: white transparent transparent transparent; border-radius: 50%; animation: spin 0.75s linear infinite;"></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Password Reset Modal -->
+<div id="passwordResetModal"
+    style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 1050; align-items: center; justify-content: center;">
+    <div
+        style="background-color: white; border-radius: 12px; max-width: 400px; width: 90%; margin: auto; box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15); border: none;">
+        <div style="background-color: white; border: 0; padding: 1.5rem 1.5rem 0.5rem;">
+            <h5 style="color: #212529; margin-bottom: 0; font-size: 1.25rem; font-weight: 500;">Reset Password</h5>
+            <button type="button" onclick="closePasswordModal()"
+                style="background: none; border: none; font-size: 1.5rem; color: #6c757d; cursor: pointer; padding: 0; line-height: 1; position: absolute; top: 1.5rem; right: 1.5rem;">&times;</button>
+        </div>
+        <div style="background-color: white; padding: 1rem 1.5rem;">
+            <p style="color: #6c757d; margin-bottom: 1.5rem;">Enter a new password for this employee.</p>
+
+            <div style="margin-bottom: 1rem;">
+                <label style="display: block; font-weight: 500; margin-bottom: 8px; color: #212529;">New
+                    Password</label>
+                <div class="password-field-wrapper" style="position: relative;">
+                    <input type="password" id="new-password" placeholder="Enter new password"
+                        style="display: block; width: 100%; padding: 10px 40px 10px 12px; font-size: 14px; line-height: 1.5; color: #212529; background-color: #ffffff !important; border: 1px solid #dee2e6; border-radius: 6px;">
+                    <button type="button" class="password-toggle-btn" id="toggle-new-password"
+                        style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; padding: 5px; display: flex; align-items: center; justify-content: center; color: #6c757d; transition: color 0.2s ease;">
+                        <i class="material-symbols-outlined" style="font-size: 20px;"
+                            id="new-password-icon">visibility</i>
+                    </button>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 1rem;">
+                <label style="display: block; font-weight: 500; margin-bottom: 8px; color: #212529;">Confirm
+                    Password</label>
+                <div class="password-field-wrapper" style="position: relative;">
+                    <input type="password" id="confirm-password" placeholder="Confirm new password"
+                        style="display: block; width: 100%; padding: 10px 40px 10px 12px; font-size: 14px; line-height: 1.5; color: #212529; background-color: #ffffff !important; border: 1px solid #dee2e6; border-radius: 6px;">
+                    <button type="button" class="password-toggle-btn" id="toggle-confirm-password"
+                        style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; padding: 5px; display: flex; align-items: center; justify-content: center; color: #6c757d; transition: color 0.2s ease;">
+                        <i class="material-symbols-outlined" style="font-size: 20px;"
+                            id="confirm-password-icon">visibility</i>
+                    </button>
+                </div>
+            </div>
+
+            <div id="password-error" style="color: #dc3545; font-size: 0.875rem; display: none; margin-top: 0.5rem;">
+            </div>
+        </div>
+        <div style="background-color: white; border: 0; padding: 0.5rem 1.5rem 1.5rem;">
+            <div style="display: flex; flex-wrap: wrap; margin-right: -0.5rem; margin-left: -0.5rem; width: 100%;">
+                <div style="flex: 0 0 50%; max-width: 50%; padding-right: 0.5rem; padding-left: 0.5rem;">
+                    <button type="button" onclick="closePasswordModal()"
+                        style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; background-color: white; border: 1px solid #6c757d; color: #6c757d; border-radius: 6px; font-weight: 500; padding: 10px 16px; font-size: 14px; width: 100%; cursor: pointer; transition: all 0.2s ease;">
+                        Cancel
+                    </button>
+                </div>
+                <div style="flex: 0 0 50%; max-width: 50%; padding-right: 0.5rem; padding-left: 0.5rem;">
+                    <button type="button" id="confirm-password-reset"
+                        style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; background-color: #f59e0b; border: 1px solid #f59e0b; color: white; border-radius: 6px; font-weight: 500; padding: 10px 16px; font-size: 14px; width: 100%; cursor: pointer; transition: all 0.2s ease;">
+                        <i class="material-symbols-outlined" style="font-size: 16px;">lock_reset</i>
+                        Update Password
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const documentsContainer = document.getElementById('documents-container');
+        const addDocumentBtn = document.getElementById('add-document');
+        const forgotPasswordBtn = document.getElementById('forgot-password-btn');
+        const confirmPasswordReset = document.getElementById('confirm-password-reset');
+
+        let currentEmployeeId = null;
+
+        // Form submission spinner
+        const form = document.getElementById('edit-employee-form');
+        const submitBtn = document.getElementById('submit-btn');
+        const submitBtnContent = document.getElementById('submit-btn-content');
+        const submitSpinner = document.getElementById('submit-spinner');
+
+        if (form && submitBtn && submitSpinner && submitBtnContent) {
+            form.addEventListener('submit', function (e) {
+                // Hide the button text content
+                submitBtnContent.style.display = 'none';
+                // Show the spinner
+                submitSpinner.style.display = 'inline-block';
+                // Disable the button to prevent double submission
+                submitBtn.disabled = true;
+            });
+        }
+
+        // Password visibility toggle for main password field
+        const passwordField = document.getElementById('password-field');
+        const togglePassword = document.getElementById('toggle-password');
+        const passwordIcon = document.getElementById('password-icon');
+
+        if (togglePassword && passwordField) {
+            togglePassword.addEventListener('click', function () {
+                const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordField.setAttribute('type', type);
+
+                if (type === 'password') {
+                    passwordIcon.textContent = 'visibility';
+                    togglePassword.style.color = '#6c757d';
+                } else {
+                    passwordIcon.textContent = 'visibility_off';
+                    togglePassword.style.color = '#007bff';
+                }
+            });
+        }
+
+        // Password visibility toggle for modal new password
+        const newPasswordField = document.getElementById('new-password');
+        const toggleNewPassword = document.getElementById('toggle-new-password');
+        const newPasswordIcon = document.getElementById('new-password-icon');
+
+        if (toggleNewPassword && newPasswordField) {
+            toggleNewPassword.addEventListener('click', function () {
+                const type = newPasswordField.getAttribute('type') === 'password' ? 'text' : 'password';
+                newPasswordField.setAttribute('type', type);
+
+                if (type === 'password') {
+                    newPasswordIcon.textContent = 'visibility';
+                    toggleNewPassword.style.color = '#6c757d';
+                } else {
+                    newPasswordIcon.textContent = 'visibility_off';
+                    toggleNewPassword.style.color = '#007bff';
+                }
+            });
+        }
+
+        // Password visibility toggle for modal confirm password
+        const confirmPasswordField = document.getElementById('confirm-password');
+        const toggleConfirmPassword = document.getElementById('toggle-confirm-password');
+        const confirmPasswordIcon = document.getElementById('confirm-password-icon');
+
+        if (toggleConfirmPassword && confirmPasswordField) {
+            toggleConfirmPassword.addEventListener('click', function () {
+                const type = confirmPasswordField.getAttribute('type') === 'password' ? 'text' : 'password';
+                confirmPasswordField.setAttribute('type', type);
+
+                if (type === 'password') {
+                    confirmPasswordIcon.textContent = 'visibility';
+                    toggleConfirmPassword.style.color = '#6c757d';
+                } else {
+                    confirmPasswordIcon.textContent = 'visibility_off';
+                    toggleConfirmPassword.style.color = '#007bff';
+                }
+            });
+        }
+
+        // Initialize status radio buttons
+        const statusRadios = document.querySelectorAll('.status-radio');
+
+        function updateStatusStyles() {
+            const activeRadio = document.getElementById('active_yes');
+            const inactiveRadio = document.getElementById('active_no');
+            const activeLabel = document.querySelector('label[for="active_yes"]');
+            const inactiveLabel = document.querySelector('label[for="active_no"]');
+
+            if (activeRadio && activeRadio.checked) {
+                activeLabel.style.borderColor = '#28a745';
+                activeLabel.style.color = '#28a745';
+                activeLabel.style.backgroundColor = 'rgba(40, 167, 69, 0.1)';
+                activeLabel.querySelector('.check-icon').style.opacity = '1';
+                activeLabel.querySelector('.check-icon').style.transform = 'scale(1.1)';
+
+                inactiveLabel.style.borderColor = '#e9ecef';
+                inactiveLabel.style.color = '#6c757d';
+                inactiveLabel.style.backgroundColor = 'white';
+                inactiveLabel.querySelector('.check-icon').style.opacity = '0.5';
+                inactiveLabel.querySelector('.check-icon').style.transform = 'scale(1)';
+            } else if (inactiveRadio && inactiveRadio.checked) {
+                activeLabel.style.borderColor = '#e9ecef';
+                activeLabel.style.color = '#6c757d';
+                activeLabel.style.backgroundColor = 'white';
+                activeLabel.querySelector('.check-icon').style.opacity = '0.5';
+                activeLabel.querySelector('.check-icon').style.transform = 'scale(1)';
+
+                inactiveLabel.style.borderColor = '#dc3545';
+                inactiveLabel.style.color = '#dc3545';
+                inactiveLabel.style.backgroundColor = 'rgba(220, 53, 69, 0.1)';
+                inactiveLabel.querySelector('.check-icon').style.opacity = '1';
+                inactiveLabel.querySelector('.check-icon').style.transform = 'scale(1.1)';
+            }
+        }
+
+        statusRadios.forEach(radio => {
+            radio.addEventListener('change', updateStatusStyles);
+        });
+
+        // Initialize file upload functionality (simplified version)
+        function initializeFileUpload(uploadArea) {
+            const fileInput = uploadArea.querySelector('.file-upload-input');
+            const preview = uploadArea.querySelector('.file-preview');
+            const uploadContent = uploadArea.querySelector('.file-upload-content');
+
+            if (!fileInput) return;
+
+            fileInput.addEventListener('change', function () {
+                handleFileSelection(this, preview, uploadContent);
+            });
+        }
+
+        function handleFileSelection(fileInput, preview, uploadContent) {
+            const file = fileInput.files[0];
+            if (file) {
+                const maxSize = fileInput.closest('.document-upload-area') ? 10 * 1024 * 1024 : 5 * 1024 * 1024;
+                if (file.size > maxSize) {
+                    alert(`File is too large. Maximum size is ${maxSize / (1024 * 1024)}MB.`);
+                    fileInput.value = '';
+                    return;
+                }
+
+                preview.innerHTML = '';
+
+                const previewItem = document.createElement('div');
+                previewItem.style.cssText = 'display: flex; align-items: center; background: white; border: 1px solid #e9ecef; border-radius: 6px; padding: 12px; margin-bottom: 8px; position: relative;';
+
+                const fileInfo = document.createElement('div');
+                fileInfo.style.cssText = 'flex-grow: 1;';
+
+                const fileName = document.createElement('div');
+                fileName.style.cssText = 'font-weight: 500; color: #212529; font-size: 14px; margin-bottom: 4px; word-break: break-word;';
+                fileName.textContent = file.name;
+
+                const fileSize = document.createElement('div');
+                fileSize.style.cssText = 'font-size: 12px; color: #6c757d;';
+                fileSize.textContent = formatFileSize(file.size);
+
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.style.cssText = 'background: none; border: none; color: #6c757d; cursor: pointer; padding: 6px; border-radius: 4px; display: flex; align-items: center; justify-content: center; min-height: auto;';
+                removeBtn.innerHTML = '<i class="material-symbols-outlined" style="font-size: 16px;">close</i>';
+
+                removeBtn.addEventListener('click', function () {
+                    fileInput.value = '';
+                    preview.innerHTML = '';
+                    uploadContent.style.display = 'block';
+                });
+
+                fileInfo.appendChild(fileName);
+                fileInfo.appendChild(fileSize);
+
+                previewItem.appendChild(fileInfo);
+                previewItem.appendChild(removeBtn);
+
+                preview.appendChild(previewItem);
+
+                uploadContent.style.display = 'none';
+            }
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Add document field
+        if (addDocumentBtn) {
+            // Add document field
+            let documentIndex = 1;
+            addDocumentBtn.addEventListener('click', function () {
+                const newDocument = document.createElement('div');
+                newDocument.className = 'document-row';
+                newDocument.style.cssText = 'flex: 0 0 calc(50% - 0.75rem); max-width: calc(50% - 0.75rem); padding-right: 0; padding-left: 0;';
+                newDocument.innerHTML = `
+                <div style="border: 1px solid #dee2e6; border-radius: 8px; padding: 0.75rem; background-color: #ffffff;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                        <div style="flex-grow: 1; margin-right: 0.75rem;">
+                            <label style="display: block; font-weight: 500; margin-bottom: 8px; color: #212529;">Document Type</label>
+                            <select name="document_types[]" style="display: block; width: 100%; padding: 10px 12px; font-size: 14px; line-height: 1.5; color: #212529; background-color: #ffffff !important; border: 1px solid #dee2e6; border-radius: 6px;">
+                                <option value="">Select Document Type</option>
+                                {% for value, label in document_choices %}
+                                <option value="{{ value }}">{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button type="button" class="remove-document" style="background: none; border: none; color: #dc3545; cursor: pointer; padding: 8px; margin-top: 28px;">
+                            <i class="material-symbols-outlined" style="font-size: 20px;">close</i>
+                        </button>
+                    </div>
+                    
+                    <div style="margin-bottom: 0.5rem;">
+                        <label style="display: block; font-weight: 500; margin-bottom: 8px; color: #212529;">Upload File</label>
+                        <div style="margin-top: 8px;">
+                            <div class="document-upload-area" style="border: 2px dashed #dee2e6; border-radius: 8px; padding: 30px 20px; text-align: center; background-color: #ffffff; position: relative; min-height: 150px;">
+                                <div class="file-upload-content">
+                                    <i class="material-symbols-outlined" style="font-size: 32px; color: #6c757d; margin-bottom: 8px;">cloud_upload</i>
+                                    <h5 style="font-size: 15px; font-weight: 500; color: #212529; margin-bottom: 4px;">Browse file</h5>
+                                    <p style="font-size: 12px; color: #6c757d; margin-bottom: 0;">PDF, JPG, PNG up to 10MB</p>
+                                    <input type="file" class="file-upload-input" name="document_files_${documentIndex}" accept=".pdf,.jpg,.jpeg,.png" multiple style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; opacity: 0; cursor: pointer;">
+                                </div>
+                                <div class="file-preview"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+                documentsContainer.appendChild(newDocument);
+                documentIndex++;
+                initializeFileUpload(newDocument.querySelector('.document-upload-area'));
+            });
+        }
+
+        function reindexDocuments() {
+            if (!documentsContainer) return;
+            const rows = documentsContainer.querySelectorAll('.document-row');
+            rows.forEach((row, index) => {
+                const fileInput = row.querySelector('.file-upload-input');
+                if (fileInput) {
+                    fileInput.name = `document_files_${index}`;
+                }
+            });
+        }
+
+        // Remove document field
+        if (documentsContainer) {
+            documentsContainer.addEventListener('click', function (e) {
+                if (e.target.closest('.remove-document')) {
+                    const documentRow = e.target.closest('.document-row');
+                    if (documentRow && documentsContainer.children.length > 1) {
+                        documentRow.remove();
+                        reindexDocuments();
+                    }
+                }
+            });
+        }
+
+        // Initialize file upload for existing elements
+        document.querySelectorAll('.document-upload-area, #profile-pic-upload-area').forEach(area => {
+            initializeFileUpload(area);
+        });
+
+        // Forgot Password functionality
+        if (forgotPasswordBtn) {
+            forgotPasswordBtn.addEventListener('click', function () {
+                currentEmployeeId = this.getAttribute('data-employee-id');
+                document.getElementById('new-password').value = '';
+                document.getElementById('confirm-password').value = '';
+                document.getElementById('password-error').style.display = 'none';
+                document.getElementById('passwordResetModal').style.display = 'flex';
+            });
+        }
+
+        if (confirmPasswordReset) {
+            confirmPasswordReset.addEventListener('click', function () {
+                if (!currentEmployeeId) return;
+
+                const newPassword = document.getElementById('new-password').value;
+                const confirmPassword = document.getElementById('confirm-password').value;
+                const errorDiv = document.getElementById('password-error');
+
+                if (!newPassword) {
+                    errorDiv.textContent = 'Please enter a new password';
+                    errorDiv.style.display = 'block';
+                    return;
+                }
+
+                if (newPassword.length < 6) {
+                    errorDiv.textContent = 'Password must be at least 6 characters';
+                    errorDiv.style.display = 'block';
+                    return;
+                }
+
+                if (newPassword !== confirmPassword) {
+                    errorDiv.textContent = 'Passwords do not match';
+                    errorDiv.style.display = 'block';
+                    return;
+                }
+
+                errorDiv.style.display = 'none';
+
+                const resetBtn = this;
+                const originalText = resetBtn.innerHTML;
+                resetBtn.innerHTML = '<i class="material-symbols-outlined" style="font-size: 16px; animation: spin 1s linear infinite;">refresh</i> Updating...';
+                resetBtn.disabled = true;
+
+                fetch(`/forgot-password/${currentEmployeeId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCsrfToken(),
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        password: newPassword
+                    })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            closePasswordModal();
+                            alert('Password updated successfully');
+                        } else {
+                            errorDiv.textContent = data.error || 'Failed to update password';
+                            errorDiv.style.display = 'block';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        errorDiv.textContent = 'An error occurred while resetting the password.';
+                        errorDiv.style.display = 'block';
+                    })
+                    .finally(() => {
+                        resetBtn.innerHTML = originalText;
+                        resetBtn.disabled = false;
+                    });
+            });
+        }
+
+        // Modal close functions
+        window.closePasswordModal = function () {
+            document.getElementById('passwordResetModal').style.display = 'none';
+        }
+
+        // CSRF Token function
+        function getCsrfToken() {
+            const name = 'csrftoken';
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Close modals when clicking outside
+        const modal = document.getElementById('passwordResetModal');
+        if (modal) {
+            modal.addEventListener('click', function (e) {
+                if (e.target === this) {
+                    closePasswordModal();
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

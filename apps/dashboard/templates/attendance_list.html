@@ -1,0 +1,585 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="main-content-container overflow-hidden">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4 mt-1">
+        <h3 class="mb-0 text-dark">Attendance Management</h3>
+        <div class="d-flex gap-2">
+            <a href="?export=excel&{% for key, value in request.GET.items %}{% if key != 'export' %}{{ key }}={{ value }}&{% endif %}{% endfor %}"
+                class="btn btn-success d-flex align-items-center gap-2"
+                style="background-color: #28a745; border-color: #28a745; color: white;">
+                <i class="material-symbols-outlined fs-16">description</i>
+                Export Excel
+            </a>
+            <a href="{% url 'daily-attendance' %}" class="btn btn-outline-secondary d-flex align-items-center gap-2">
+                <i class="material-symbols-outlined fs-16">calendar_today</i>
+                Daily Overview
+            </a>
+        </div>
+    </div>
+
+    <!-- Display Messages -->
+    {% if messages %}
+    <div class="mb-4">
+        {% for message in messages %}
+        <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show rounded-8"
+            role="alert">
+            <div class="d-flex align-items-center">
+                <i class="material-symbols-outlined me-2 fs-16">
+                    {% if message.tags == 'success' %}check_circle{% endif %}
+                    {% if message.tags == 'error' or message.tags == 'danger' %}error{% endif %}
+                    {% if message.tags == 'warning' %}warning{% endif %}
+                    {% if message.tags == 'info' %}info{% endif %}
+                </i>
+                <span class="fw-medium">{{ message }}</span>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Filters Card -->
+    <div class="card bg-white rounded-10 border border-white mb-4"
+        style="border-radius: 10px; background-color: #ffffff;">
+        <div class="card-body">
+            <form method="GET" action="" class="row g-3 align-items-end">
+                <div class="col-xl-2 col-md-4">
+                    <label class="form-label text-dark fw-medium">Start Date</label>
+                    <input type="date" name="start_date" class="form-control bg-white" value="{{ start_date }}"
+                        style="border-radius: 6px; border: 1px solid #dee2e6; padding: 10px 12px; font-size: 14px; background-color: #ffffff !important;">
+                </div>
+                <div class="col-xl-2 col-md-4">
+                    <label class="form-label text-dark fw-medium">End Date</label>
+                    <input type="date" name="end_date" class="form-control bg-white" value="{{ end_date }}"
+                        style="border-radius: 6px; border: 1px solid #dee2e6; padding: 10px 12px; font-size: 14px; background-color: #ffffff !important;">
+                </div>
+                <div class="col-xl-2 col-md-4">
+                    <label class="form-label text-dark fw-medium">Company</label>
+                    <select name="company" id="company-select" class="form-select bg-white"
+                        style="border-radius: 6px; border: 1px solid #dee2e6; padding: 10px 12px; font-size: 14px; background-color: #ffffff !important;">
+                        <option value="">All Companies</option>
+                        {% for comp in companies %}
+                        <option value="{{ comp.id }}" {% if current_company|stringformat:"s" == comp.id|stringformat:"s" %}selected{% endif %}>{{ comp.company_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-xl-2 col-md-4">
+                    <label class="form-label text-dark fw-medium">Employee</label>
+                    <select name="employee" id="employee-select" class="form-select bg-white"
+                        style="border-radius: 6px; border: 1px solid #dee2e6; padding: 10px 12px; font-size: 14px; background-color: #ffffff !important;">
+                        <option value="">All Employees</option>
+                        {% for emp in employees %}
+                        <option value="{{ emp.employeeId }}" {% if current_employee == emp.employeeId %}selected{% endif %}>
+                            {{ emp.employeeId }} - {{ emp.employee_name|default:"N/A" }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-xl-2 col-md-4">
+                    <label class="form-label text-dark fw-medium">Check Type</label>
+                    <select name="check_type" class="form-select bg-white"
+                        style="border-radius: 6px; border: 1px solid #dee2e6; padding: 10px 12px; font-size: 14px; background-color: #ffffff !important;">
+                        <option value="">All Types</option>
+                        <option value="in" {% if current_check_type == 'in' %}selected{% endif %}>Check In</option>
+                        <option value="out" {% if current_check_type == 'out' %}selected{% endif %}>Check Out</option>
+                    </select>
+                </div>
+                <div class="col-xl-2 col-md-4">
+                    <label class="form-label text-dark fw-medium">Status</label>
+                    <select name="status" class="form-select bg-white"
+                        style="border-radius: 6px; border: 1px solid #dee2e6; padding: 10px 12px; font-size: 14px; background-color: #ffffff !important;">
+                        <option value="">All Status</option>
+                        <option value="present" {% if current_status == 'present' %}selected{% endif %}>Present</option>
+                        <option value="absent" {% if current_status == 'absent' %}selected{% endif %}>Absent</option>
+                    </select>
+                </div>
+                <div class="col-xl-2 col-md-4">
+                    <label class="form-label text-dark fw-medium">Sort By</label>
+                    <select name="sort_by" class="form-select bg-white"
+                        style="border-radius: 6px; border: 1px solid #dee2e6; padding: 10px 12px; font-size: 14px; background-color: #ffffff !important;">
+                        <option value="-date" {% if current_sort == '-date' %}selected{% endif %}>Date (Newest)</option>
+                        <option value="date_asc" {% if current_sort == 'date_asc' %}selected{% endif %}>Date (Oldest)</option>
+                        <option value="name_asc" {% if current_sort == 'name_asc' %}selected{% endif %}>Name (A-Z)</option>
+                        <option value="name_desc" {% if current_sort == 'name_desc' %}selected{% endif %}>Name (Z-A)</option>
+                    </select>
+                </div>
+                <div class="col-xl-2 col-md-4">
+                    <div class="d-flex gap-2 h-100">
+                        <button type="submit"
+                            class="btn btn-primary text-white w-100 d-flex align-items-center justify-content-center gap-2"
+                            style="border-radius: 6px; font-weight: 500; border: 1px solid #007bff; background-color: #007bff; padding: 10px 16px; font-size: 14px;">
+                            <i class="material-symbols-outlined fs-16 text-white">filter_alt</i>
+                            Apply
+                        </button>
+                        <a href="{% url 'attendance-list' %}"
+                            class="btn btn-outline-secondary w-100 d-flex align-items-center justify-content-center gap-2"
+                            style="border-radius: 6px; font-weight: 500; border: 1px solid #6c757d; background-color: white; color: #6c757d; padding: 10px 16px; font-size: 14px;">
+                            <i class="material-symbols-outlined fs-16">refresh</i>
+                            Reset
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Attendance Records Table -->
+    <div class="card bg-white rounded-10 border border-white mb-4"
+        style="border-radius: 10px; background-color: #ffffff;">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table align-middle w-100 bg-white" style="background-color: #ffffff !important; table-layout: fixed;">
+                    <thead>
+                        <tr>
+                            <th scope="col" class="fw-medium text-dark"
+                                style="border-bottom: 2px solid #e9ecef; font-weight: 600; background: #f8f9fa !important; padding: 16px 12px; width: 80px;">
+                                SI No</th>
+                            <th scope="col" class="fw-medium text-dark"
+                                style="border-bottom: 2px solid #e9ecef; font-weight: 600; background: #f8f9fa !important; padding: 16px 12px; width: 200px;">
+                                Employee</th>
+                            <th scope="col" class="fw-medium text-dark"
+                                style="border-bottom: 2px solid #e9ecef; font-weight: 600; background: #f8f9fa !important; padding: 16px 12px; width: 120px;">
+                                Date</th>
+                            <th scope="col" class="fw-medium text-dark"
+                                style="border-bottom: 2px solid #e9ecef; font-weight: 600; background: #f8f9fa !important; padding: 16px 12px; width: 100px;">
+                                Status</th>
+                            <th scope="col" class="fw-medium text-dark"
+                                style="border-bottom: 2px solid #e9ecef; font-weight: 600; background: #f8f9fa !important; padding: 16px 12px; width: 120px;">
+                                Check In</th>
+                            <th scope="col" class="fw-medium text-dark"
+                                style="border-bottom: 2px solid #e9ecef; font-weight: 600; background: #f8f9fa !important; padding: 16px 12px; width: 120px;">
+                                Check Out</th>
+                            <th scope="col" class="fw-medium text-dark"
+                                style="border-bottom: 2px solid #e9ecef; font-weight: 600; background: #f8f9fa !important; padding: 16px 12px; width: 100px;">
+                                Working Hours</th>
+                            <th scope="col" class="fw-medium text-dark"
+                                style="border-bottom: 2px solid #e9ecef; font-weight: 600; background: #f8f9fa !important; padding: 16px 12px; width: 250px;">
+                                Location</th>
+                            <th scope="col" class="fw-medium text-dark"
+                                style="border-bottom: 2px solid #e9ecef; font-weight: 600; background: #f8f9fa !important; padding: 16px 12px; width: 120px;">
+                                Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if grouped_records %}
+                            {% for data in grouped_records %}
+                            <tr class="bg-white" style="background-color: #ffffff !important;">
+                                <td class="bg-white"
+                                    style="background-color: #ffffff !important; border-bottom: 1px solid #e9ecef; vertical-align: middle; padding: 16px 12px;">
+                                    <div class="text-dark fw-medium">{{ forloop.counter0|add:page_obj.start_index }}</div>
+                                </td>
+                                <td class="bg-white"
+                                    style="background-color: #ffffff !important; border-bottom: 1px solid #e9ecef; vertical-align: middle; padding: 16px 12px; max-width: 200px;">
+                                    <div class="d-flex align-items-center">
+                                        {% if data.employee.profile_pic %}
+                                        <img src="{{ data.employee.profile_pic.url }}" class="rounded-circle me-2"
+                                            style="width: 35px; height: 35px;" alt="{{ data.employee.employee_name }}">
+                                        {% else %}
+                                        <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center me-2"
+                                            style="width: 35px; height: 35px;">
+                                            <span class="text-white fw-bold small">{{ data.employee.employee_name|default:data.employee.employeeId|first|upper }}</span>
+                                        </div>
+                                        {% endif %}
+                                        <div>
+                                            <div class="fw-medium text-dark small">{{ data.employee.employee_name|default:"Not Set" }}</div>
+                                            <small class="text-muted">{{ data.employee.employeeId }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="bg-white"
+                                    style="background-color: #ffffff !important; border-bottom: 1px solid #e9ecef; vertical-align: middle; padding: 16px 12px;">
+                                    <div class="text-dark fw-medium">{{ data.date|date:"M. d, Y" }}</div>
+                                </td>
+                                <td class="bg-white"
+                                    style="background-color: #ffffff !important; border-bottom: 1px solid #e9ecef; vertical-align: middle; padding: 16px 12px;">
+                                    {% if data.status == 'Present' %}
+                                    <span class="badge"
+                                        style="font-size: 12px; font-weight: 500; display: inline-flex; align-items: center; justify-content: center; min-width: 80px; padding: 8px 12px; border: 1px solid; border-radius: 50px; background-color: rgba(25, 135, 84, 0.1); color: #198754; border-color: rgba(25, 135, 84, 0.25);">
+                                        <i class="material-symbols-outlined fs-14 me-1">check_circle</i>
+                                        Present
+                                    </span>
+                                    {% else %}
+                                    <span class="badge"
+                                        style="font-size: 12px; font-weight: 500; display: inline-flex; align-items: center; justify-content: center; min-width: 80px; padding: 8px 12px; border: 1px solid; border-radius: 50px; background-color: rgba(220, 53, 69, 0.1); color: #dc3545; border-color: rgba(220, 53, 69, 0.25);">
+                                        <i class="material-symbols-outlined fs-14 me-1">cancel</i>
+                                        Absent
+                                    </span>
+                                    {% endif %}
+                                </td>
+                                <td class="bg-white"
+                                    style="background-color: #ffffff !important; border-bottom: 1px solid #e9ecef; vertical-align: middle; padding: 16px 12px;">
+                                    {% if data.records %}
+                                        {% for record in data.records %}
+                                            {% if record.check_type == 'in' %}
+                                                <div class="text-dark">{{ record.check_time }}</div>
+                                            {% endif %}
+                                        {% endfor %}
+                                        {% if not data.records|length %}
+                                            <div class="text-muted">N/A</div>
+                                        {% endif %}
+                                    {% else %}
+                                        <div class="text-muted">N/A</div>
+                                    {% endif %}
+                                </td>
+                                <td class="bg-white"
+                                    style="background-color: #ffffff !important; border-bottom: 1px solid #e9ecef; vertical-align: middle; padding: 16px 12px;">
+                                    {% if data.records %}
+                                        {% for record in data.records %}
+                                            {% if record.check_type == 'out' %}
+                                                <div class="text-dark">{{ record.check_time }}</div>
+                                            {% endif %}
+                                        {% endfor %}
+                                        {% if not data.records|length %}
+                                            <div class="text-muted">N/A</div>
+                                        {% endif %}
+                                    {% else %}
+                                        <div class="text-muted">N/A</div>
+                                    {% endif %}
+                                </td>
+                                <td class="bg-white"
+                                    style="background-color: #ffffff !important; border-bottom: 1px solid #e9ecef; vertical-align: middle; padding: 16px 12px;">
+                                    <div class="text-dark">{{ data.working_hours }}</div>
+                                </td>
+                                <td class="bg-white"
+                                    style="background-color: #ffffff !important; border-bottom: 1px solid #e9ecef; vertical-align: middle; padding: 16px 12px;">
+                                    {% if data.records %}
+                                        {% with location_display=False %}
+                                            {% for record in data.records %}
+                                                {% if record.location and not location_display %}
+                                                    <div class="text-dark" style="word-wrap: break-word; max-width: 230px;">{{ record.location }}</div>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endwith %}
+                                        {% if not data.records|length %}
+                                            <div class="text-muted">N/A</div>
+                                        {% endif %}
+                                    {% else %}
+                                        <div class="text-muted">N/A</div>
+                                    {% endif %}
+                                </td>
+                                <td class="bg-white"
+                                    style="background-color: #ffffff !important; border-bottom: 1px solid #e9ecef; vertical-align: middle; padding: 16px 12px;">
+                                    <div class="d-flex justify-content-end" style="gap: 8px;">
+                                        <a href="{% url 'employee-attendance-detail' data.employee.id %}?date={{ data.date|date:'Y-m-d' }}"
+                                            class="btn btn-outline-primary d-flex align-items-center justify-content-center gap-2 py-2 px-3"
+                                            style="border-radius: 6px; font-weight: 500; border: 1px solid #007bff; background-color: white; color: #007bff; text-decoration: none; min-height: 36px; font-size: 14px;"
+                                            data-bs-toggle="tooltip" data-bs-placement="top"
+                                            data-bs-title="View Day Details">
+                                            <i class="material-symbols-outlined fs-16">visibility</i>
+                                            <span class="d-none d-sm-inline">View</span>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                        <tr class="bg-white" style="background-color: #ffffff !important;">
+                            <td colspan="9" class="text-center py-4 bg-white"
+                                style="background-color: #ffffff !important; border-bottom: 1px solid #e9ecef; vertical-align: middle; padding: 16px 12px;">
+                                <div class="text-muted">
+                                    <i class="material-symbols-outlined fs-48 text-dark">schedule</i>
+                                    <p class="mt-2 mb-0 text-dark">No attendance records found.</p>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            {% if is_paginated %}
+            <div class="d-flex flex-column align-items-center gap-3 pt-20 pb-20 bg-white"
+                style="background-color: #ffffff !important; padding: 24px 0;">
+                <!-- Records count -->
+                <div class="text-center">
+                    <span class="fs-14 text-muted fw-medium">
+                        Showing <span class="text-dark">{{ page_obj.start_index }}</span> - <span class="text-dark">{{ page_obj.end_index }}</span> of <span class="text-dark">{{ page_obj.paginator.count }}</span> records
+                    </span>
+                </div>
+                
+                <!-- Pagination controls -->
+                <nav aria-label="Page navigation">
+                    <ul class="pagination mb-0 gap-1">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link"
+                                href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                aria-label="Previous"
+                                style="border-radius: 8px; border: 1px solid #e0e6ed; padding: 10px 14px; color: #6c757d; text-decoration: none; font-weight: 500; transition: all 0.2s ease; background-color: #ffffff;">
+                                <i class="material-symbols-outlined fs-18" style="vertical-align: middle;">chevron_left</i>
+                            </a>
+                        </li>
+                        {% endif %}
+
+                        {% with current_page=page_obj.number total_pages=page_obj.paginator.num_pages %}
+                        {% if total_pages <= 10 %}
+                            {% for num in page_obj.paginator.page_range %}
+                                {% if page_obj.number == num %}
+                                <li class="page-item active"><a class="page-link" href="#"
+                                        style="border-radius: 8px; border: 2px solid #007bff; background-color: #007bff; color: white; padding: 10px 14px; text-decoration: none; font-weight: 600; box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);">{{ num }}</a></li>
+                                {% else %}
+                                <li class="page-item"><a class="page-link"
+                                        href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                        style="border-radius: 8px; border: 1px solid #e0e6ed; color: #495057; padding: 10px 14px; text-decoration: none; font-weight: 500; transition: all 0.2s ease; background-color: #ffffff;">{{ num }}</a></li>
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            {% if current_page > 3 %}
+                                <li class="page-item"><a class="page-link"
+                                        href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                        style="border-radius: 8px; border: 1px solid #e0e6ed; color: #495057; padding: 10px 14px; text-decoration: none; font-weight: 500; transition: all 0.2s ease; background-color: #ffffff;">1</a></li>
+                                {% if current_page > 4 %}
+                                <li class="page-item disabled"><span class="page-link"
+                                        style="border-radius: 8px; border: 1px solid #e0e6ed; padding: 10px 14px; color: #6c757d; background-color: #f8f9fa;">...</span></li>
+                                {% endif %}
+                            {% endif %}
+                            
+                            {% for num in page_obj.paginator.page_range %}
+                                {% if num == current_page or num == current_page|add:'-1' or num == current_page|add:'1' %}
+                                    {% if page_obj.number == num %}
+                                    <li class="page-item active"><a class="page-link" href="#"
+                                            style="border-radius: 8px; border: 2px solid #007bff; background-color: #007bff; color: white; padding: 10px 14px; text-decoration: none; font-weight: 600; box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);">{{ num }}</a></li>
+                                    {% else %}
+                                    <li class="page-item"><a class="page-link"
+                                            href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                            style="border-radius: 8px; border: 1px solid #e0e6ed; color: #495057; padding: 10px 14px; text-decoration: none; font-weight: 500; transition: all 0.2s ease; background-color: #ffffff;">{{ num }}</a></li>
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if current_page < total_pages|add:'-2' %}
+                                {% if current_page < total_pages|add:'-3' %}
+                                <li class="page-item disabled"><span class="page-link"
+                                        style="border-radius: 8px; border: 1px solid #e0e6ed; padding: 10px 14px; color: #6c757d; background-color: #f8f9fa;">...</span></li>
+                                {% endif %}
+                                <li class="page-item"><a class="page-link"
+                                        href="?page={{ total_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                        style="border-radius: 8px; border: 1px solid #e0e6ed; color: #495057; padding: 10px 14px; text-decoration: none; font-weight: 500; transition: all 0.2s ease; background-color: #ffffff;">{{ total_pages }}</a></li>
+                            {% endif %}
+                        {% endif %}
+                        {% endwith %}
+
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link"
+                                href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                aria-label="Next"
+                                style="border-radius: 8px; border: 1px solid #e0e6ed; padding: 10px 14px; color: #6c757d; text-decoration: none; font-weight: 500; transition: all 0.2s ease; background-color: #ffffff;">
+                                <i class="material-symbols-outlined fs-18" style="vertical-align: middle;">chevron_right</i>
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Initialize tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        });
+
+        // Add focus styles to form controls
+        var formControls = document.querySelectorAll('.form-control, .form-select');
+        formControls.forEach(function (control) {
+            control.addEventListener('focus', function () {
+                this.style.borderColor = '#007bff';
+                this.style.boxShadow = '0 0 0 0.2rem rgba(0, 123, 255, 0.1)';
+            });
+
+            control.addEventListener('blur', function () {
+                this.style.borderColor = '#dee2e6';
+                this.style.boxShadow = 'none';
+            });
+        });
+
+        // Add hover effects to buttons
+        var buttons = document.querySelectorAll('.btn');
+        buttons.forEach(function (button) {
+            button.addEventListener('mouseenter', function () {
+                if (this.classList.contains('btn-primary')) {
+                    this.style.backgroundColor = '#0056b3';
+                    this.style.borderColor = '#0056b3';
+                    this.style.transform = 'translateY(-1px)';
+                } else if (this.classList.contains('btn-outline-secondary')) {
+                    this.style.backgroundColor = '#6c757d';
+                    this.style.borderColor = '#6c757d';
+                    this.style.color = 'white';
+                    this.style.transform = 'translateY(-1px)';
+                } else if (this.classList.contains('btn-outline-primary')) {
+                    this.style.backgroundColor = '#007bff';
+                    this.style.borderColor = '#007bff';
+                    this.style.color = 'white';
+                    this.style.transform = 'translateY(-1px)';
+                }
+            });
+
+            button.addEventListener('mouseleave', function () {
+                if (this.classList.contains('btn-primary')) {
+                    this.style.backgroundColor = '#007bff';
+                    this.style.borderColor = '#007bff';
+                    this.style.transform = 'translateY(0)';
+                } else if (this.classList.contains('btn-outline-secondary')) {
+                    this.style.backgroundColor = 'white';
+                    this.style.borderColor = '#6c757d';
+                    this.style.color = '#6c757d';
+                    this.style.transform = 'translateY(0)';
+                } else if (this.classList.contains('btn-outline-primary')) {
+                    this.style.backgroundColor = 'white';
+                    this.style.borderColor = '#007bff';
+                    this.style.color = '#007bff';
+                    this.style.transform = 'translateY(0)';
+                }
+            });
+        });
+
+        // Add hover effect to table rows
+        var tableRows = document.querySelectorAll('tbody tr');
+        tableRows.forEach(function (row) {
+            row.addEventListener('mouseenter', function () {
+                this.style.backgroundColor = '#f8f9fa';
+            });
+
+            row.addEventListener('mouseleave', function () {
+                this.style.backgroundColor = '#ffffff';
+            });
+        });
+
+        // Add hover effects to pagination links
+        var paginationLinks = document.querySelectorAll('.page-link:not([href="#"])');
+        paginationLinks.forEach(function (link) {
+            link.addEventListener('mouseenter', function () {
+                if (!this.parentElement.classList.contains('active')) {
+                    this.style.backgroundColor = '#f8f9fa';
+                    this.style.borderColor = '#007bff';
+                    this.style.color = '#007bff';
+                    this.style.transform = 'translateY(-1px)';
+                    this.style.boxShadow = '0 2px 8px rgba(0, 123, 255, 0.15)';
+                }
+            });
+
+            link.addEventListener('mouseleave', function () {
+                if (!this.parentElement.classList.contains('active')) {
+                    this.style.backgroundColor = '#ffffff';
+                    this.style.borderColor = '#e0e6ed';
+                    this.style.color = '#495057';
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = 'none';
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+<style>
+    .choices {
+        margin-bottom: 0;
+    }
+
+    .choices__inner {
+        background-color: #ffffff !important;
+        border: 1px solid #dee2e6 !important;
+        border-radius: 6px !important;
+        padding: 6px 12px !important;
+        font-size: 14px !important;
+        min-height: 48px !important;
+        display: flex;
+        align-items: center;
+    }
+
+    .choices__list--single {
+        padding: 0 !important;
+        color: #212529;
+    }
+
+    .choices[data-type*="select-one"] .choices__inner {
+        padding-bottom: 6px !important;
+    }
+
+    .choices__input {
+        background-color: #ffffff !important;
+        font-size: 14px !important;
+    }
+
+    .choices__list--dropdown {
+        border-radius: 6px !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+        z-index: 1001;
+    }
+
+    .choices__list--dropdown .choices__item--selectable {
+        padding-right: 12px !important;
+    }
+
+    .choices__list--dropdown .choices__item--selectable.is-highlighted {
+        background-color: #007bff !important;
+        color: #ffffff !important;
+    }
+
+    /* Match height with other filter inputs */
+    #employee-select+.choices .choices__inner {
+        height: 48px;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const element = document.getElementById('employee-select');
+        if (element) {
+            new Choices(element, {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholder: true,
+                placeholderValue: 'All Employees',
+                shouldSort: false,
+                searchPlaceholderValue: 'Search employee...',
+            });
+        }
+
+        // Handle company change to reload page and update employee list
+        const companySelect = document.getElementById('company-select');
+        if (companySelect) {
+            companySelect.addEventListener('change', function() {
+                // Get current form parameters
+                const form = this.closest('form');
+                const formData = new FormData(form);
+                const params = new URLSearchParams();
+                
+                // Add all form parameters except company (which will be updated)
+                for (let [key, value] of formData.entries()) {
+                    if (key !== 'company') {
+                        params.append(key, value);
+                    }
+                }
+                
+                // Add the new company value
+                if (this.value) {
+                    params.append('company', this.value);
+                }
+                
+                // Clear employee filter when company changes
+                params.delete('employee');
+                
+                // Reload the page with updated parameters
+                window.location.href = window.location.pathname + '?' + params.toString();
+            });
+        }
+    });
+</script>
+{% endblock %}

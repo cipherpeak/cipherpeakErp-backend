@@ -1,0 +1,335 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="main-content-container overflow-hidden"
+    style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+    <!-- Header -->
+    <div
+        style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem; margin-top: 0.25rem;">
+        <h3 style="margin-bottom: 0; color: #212529; font-size: 1.5rem; font-weight: 600;">Delivery Notes</h3>
+    </div>
+
+    <!-- Search -->
+    <div
+        style="background-color: white; border-radius: 10px; border: 1px solid white; margin-bottom: 1.5rem; box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);">
+        <div style="padding: 1.5rem;">
+            <form method="GET" action="">
+                <div
+                    style="display: flex; flex-wrap: wrap; margin-right: -0.75rem; margin-left: -0.75rem; align-items: flex-end; gap: 1rem;">
+                    <!-- Search -->
+                    <div
+                        style="flex: 0 0 calc(30% - 1rem); max-width: calc(30% - 1rem); padding-right: 0.75rem; padding-left: 0.75rem;">
+                        <label
+                            style="display: block; font-weight: 500; margin-bottom: 8px; color: #212529;">Search</label>
+                        <div style="position: relative;">
+                            <input type="text" name="search" placeholder="Search..." value="{{ request.GET.search }}"
+                                style="display: block; width: 100%; padding: 10px 12px 10px 40px; font-size: 14px; line-height: 1.5; color: #212529; background-color: #ffffff !important; border: 1px solid #dee2e6; border-radius: 6px;">
+                            <div
+                                style="position: absolute; top: 50%; left: 0; transform: translateY(-50%); background: transparent; border: 0; margin-left: 12px;">
+                                <i class="material-symbols-outlined" style="color: #212529; font-size: 20px;">search</i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Company Filter -->
+                    <div
+                        style="flex: 0 0 calc(25% - 1rem); max-width: calc(25% - 1rem); padding-right: 0.75rem; padding-left: 0.75rem;">
+                        <label
+                            style="display: block; font-weight: 500; margin-bottom: 8px; color: #212529;">Company</label>
+                        <select name="company" id="companySelect"
+                            style="display: block; width: 100%; padding: 10px 12px; font-size: 14px; line-height: 1.5; color: #212529; background-color: #ffffff !important; border: 1px solid #dee2e6; border-radius: 6px; appearance: none; background-image: url('data:image/svg+xml;utf8,<svg fill=%22%23212529%22 height=%2224%22 viewBox=%220 0 24 24%22 width=%2224%22 xmlns=%22http://www.w3.org/2000/svg%22><path d=%22M7 10l5 5 5-5z%22/></svg>'); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px;">
+                            <option value="">All Companies</option>
+                            {% for company in companies %}
+                            <option value="{{ company.id }}" 
+                                {% if request.GET.company and request.GET.company|stringformat:"s" == company.id|stringformat:"s" %}selected{% endif %}>
+                                {{ company.company_name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Employee Filter -->
+                    <div
+                        style="flex: 0 0 calc(25% - 1rem); max-width: calc(25% - 1rem); padding-right: 0.75rem; padding-left: 0.75rem;">
+                        <label
+                            style="display: block; font-weight: 500; margin-bottom: 8px; color: #212529;">Employee</label>
+                        <select name="employee" id="employeeSelect"
+                            style="display: block; width: 100%; padding: 10px 12px; font-size: 14px; line-height: 1.5; color: #212529; background-color: #ffffff !important; border: 1px solid #dee2e6; border-radius: 6px;">
+                            <option value="">All Employees</option>
+                            {% for employee in employees %}
+                            <option value="{{ employee.id }}" data-company="{{ employee.company_id|default:'' }}"
+                                {% if request.GET.employee and request.GET.employee|stringformat:"s" == employee.id|stringformat:"s" %}selected{% endif %}>
+                                {{ employee.employee_name }} {% if employee.company %}({{ employee.company.company_name }}){% endif %}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Reset Button -->
+                    <div
+                        style="flex: 0 0 calc(20% - 1rem); max-width: calc(20% - 1rem); padding-right: 0.75rem; padding-left: 0.75rem;">
+                        <a href="{% url 'dashboard-delivery-note-list' %}"
+                            style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; background-color: white; border: 1px solid #6c757d; color: #6c757d; border-radius: 6px; font-weight: 500; padding: 12px 24px; font-size: 14px; min-height: 48px; width: 100%; text-decoration: none; transition: all 0.2s ease;">
+                            <i class="material-symbols-outlined" style="font-size: 16px;">refresh</i>
+                            Reset
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notes Grid -->
+    <div class="row g-4">
+        {% for note in notes %}
+        <div class="col-xl-4 col-lg-6 col-md-6">
+            <div class="card bg-white shadow-sm border-0 rounded-12 mb-4 h-100 transition-all note-card"
+                style="border-radius: 12px !important; border: 1px solid #f1f1f1 !important; background: #ffffff; transition: all 0.3s ease; box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04); position: relative; overflow: hidden;">
+                <div class="card-body d-flex flex-column p-0">
+                    <!-- Icon/Visual Section -->
+                    <div class="position-relative"
+                        style="height: 100px; background-color: #f8f9fa; display: flex; align-items: center; justify-content: center;">
+                        <div
+                            style="width: 50px; height: 50px; border-radius: 50%; background-color: rgba(255, 193, 7, 0.1); display: flex; align-items: center; justify-content: center;">
+                            <i class="material-symbols-outlined text-warning" style="font-size: 24px;">sticky_note_2</i>
+                        </div>
+
+                        <!-- Date Badge (Top-Right) -->
+                        <div class="position-absolute top-0 end-0 m-3">
+                            <span class="badge shadow-sm"
+                                style="font-size: 11px; font-weight: 500; padding: 6px 12px; border-radius: 30px; backdrop-filter: blur(4px); background-color: rgba(255, 255, 255, 0.9) !important; color: #212529;">
+                                {{ note.created_at|date:"M d, Y H:i" }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Content Section -->
+                    <div class="p-4 flex-grow-1 d-flex flex-column">
+                        <div class="mb-3">
+                            <h5 class="text-dark mb-2 fw-bold fs-16" style="color: #1a1f2c;">{{ note.delivery_task.task.employee.employee_name }}</h5>
+                            <p class="text-muted mb-0 fs-14" style="line-height: 1.5; white-space: pre-wrap;">
+                                {{note.note }}</p>
+                        </div>
+
+                        <div class="mt-auto">
+                            <div class="pt-3 border-top" style="border-color: #f1f5f9 !important;">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="d-flex align-items-center">
+                                        {% if note.delivery_task.task.employee.profile_pic %}
+                                        <img src="{{ note.delivery_task.task.employee.profile_pic.url }}"
+                                            style="border-radius: 50%; width: 24px; height: 24px; object-fit: cover; margin-right: 0.5rem;"
+                                            alt="user">
+                                        {% else %}
+                                        <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center me-2"
+                                            style="width: 24px; height: 24px;">
+                                            <span class="text-white fw-bold" style="font-size: 10px;">{{
+                                                note.delivery_task.task.employee.employee_name|first|upper }}</span>
+                                        </div>
+                                        {% endif %}
+                                        <span class="text-dark fs-13 fw-medium">{{ note.delivery_task.task.employee.employeeId }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="card bg-white shadow-sm border-0 rounded-12"
+                style="border-radius: 12px !important; border: 1px solid #f1f1f1 !important; background: linear-gradient(180deg, #ffffff 0%, #fcfcfc 100%); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);">
+                <div class="card-body text-center py-5" style="padding: 48px 20px;">
+                    <i class="material-symbols-outlined fs-48 text-muted mb-3 opacity-50"
+                        style="font-size: 48px; color: #6c757d; margin-bottom: 16px; opacity: 0.5;">sticky_note_2</i>
+                    <h5 class="text-dark mb-2 fw-semibold"
+                        style="font-weight: 600 !important; color: #212529; margin-bottom: 8px;">No Notes Found</h5>
+                    <p class="text-muted mb-0 fs-14" style="font-size: 14px; color: #6c757d;">Create a new note to get
+                        started.</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <div
+        style="display: flex; justify-content: center; align-items: center; text-align: center; flex-wrap: wrap; gap: 0.5rem; padding: 1.25rem 1.25rem; background-color: #ffffff; border-top: 1px solid #e9ecef; border-radius: 10px; margin-top: 1.5rem;">
+        <span style="font-size: 0.9375rem; color: #212529;">
+            Showing {{ page_obj.start_index }} - {{ page_obj.end_index }} of {{ paginator.count }} entries
+        </span>
+        <nav aria-label="Page navigation">
+            <ul style="display: flex; padding-left: 0; list-style: none; margin-bottom: 0; gap: 0.25rem;">
+                {% if page_obj.has_previous %}
+                <li>
+                    <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"
+                        aria-label="Previous"
+                        style="display: block; padding: 0.5rem 0.75rem; margin-left: -1px; line-height: 1.25; color: #007bff; text-decoration: none; background-color: #fff; border: 1px solid #dee2e6; border-radius: 0.25rem;">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% for num in paginator.page_range %}
+                {% if page_obj.number == num %}
+                <li>
+                    <a href="#"
+                        style="display: block; padding: 0.5rem 0.75rem; margin-left: -1px; line-height: 1.25; color: #fff; text-decoration: none; background-color: #007bff; border: 1px solid #007bff; border-radius: 0.25rem; z-index: 3;">{{
+                        num }}</a>
+                </li>
+                {% else %}
+                <li>
+                    <a href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"
+                        style="display: block; padding: 0.5rem 0.75rem; margin-left: -1px; line-height: 1.25; color: #007bff; text-decoration: none; background-color: #fff; border: 1px solid #dee2e6; border-radius: 0.25rem;">{{
+                        num }}</a>
+                </li>
+                {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <li>
+                    <a href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"
+                        aria-label="Next"
+                        style="display: block; padding: 0.5rem 0.75rem; margin-left: -1px; line-height: 1.25; color: #007bff; text-decoration: none; background-color: #fff; border: 1px solid #dee2e6; border-radius: 0.25rem;">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Card Hover
+        const cards = document.querySelectorAll('.note-card');
+        cards.forEach(card => {
+            card.addEventListener('mouseenter', function () {
+                this.style.transform = 'translateY(-4px)';
+                this.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.08) !important';
+                this.style.borderColor = '#e0e0e0 !important';
+            });
+
+            card.addEventListener('mouseleave', function () {
+                this.style.transform = 'translateY(0)';
+                this.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.05)';
+                this.style.borderColor = '#f1f1f1 !important';
+            });
+        });
+
+        // Initialize Choices.js for employee select
+        const employeeSelect = document.getElementById('employeeSelect');
+        const companySelect = document.getElementById('companySelect');
+        let choicesInstance = null;
+
+        if (employeeSelect) {
+            choicesInstance = new Choices(employeeSelect, {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholder: true,
+                placeholderValue: 'Search employee...',
+                shouldSort: false,
+                searchPlaceholderValue: 'Type to search...',
+                allowHTML: false,
+            });
+        }
+
+        // Filter employees by company
+        if (companySelect && employeeSelect) {
+            function filterEmployees() {
+                const selectedCompany = companySelect.value;
+                const allOptions = Array.from(employeeSelect.querySelectorAll('option'));
+                
+                // Filter options based on company
+                const filteredOptions = allOptions.filter(option => {
+                    if (!option.value) return true; // Keep "All Employees" option
+                    const optionCompany = option.getAttribute('data-company');
+                    return !selectedCompany || optionCompany === selectedCompany;
+                });
+
+                // Destroy old Choices instance
+                if (choicesInstance) {
+                    choicesInstance.destroy();
+                }
+
+                // Clear and rebuild select options
+                employeeSelect.innerHTML = '';
+                filteredOptions.forEach(option => {
+                    employeeSelect.appendChild(option.cloneNode(true));
+                });
+
+                // Reinitialize Choices
+                choicesInstance = new Choices(employeeSelect, {
+                    searchEnabled: true,
+                    itemSelectText: '',
+                    placeholder: true,
+                    placeholderValue: 'Search employee...',
+                    shouldSort: false,
+                    searchPlaceholderValue: 'Type to search...',
+                    allowHTML: false,
+                });
+            }
+
+            companySelect.addEventListener('change', function() {
+                filterEmployees();
+                // Submit form after company change
+                this.form.submit();
+            });
+
+            // Trigger filtering on page load without submitting
+            if (companySelect.value) {
+                filterEmployees();
+            }
+        }
+
+        // Submit form when employee is selected
+        if (employeeSelect) {
+            employeeSelect.addEventListener('change', function() {
+                this.form.submit();
+            });
+        }
+    });
+</script>
+
+<!-- Choices.js CSS and JS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
+<style>
+    .choices {
+        margin-bottom: 0;
+    }
+    .choices__inner {
+        background-color: #ffffff !important;
+        border: 1px solid #dee2e6 !important;
+        border-radius: 6px !important;
+        padding: 6px 12px !important;
+        font-size: 14px !important;
+        min-height: 48px !important;
+        display: flex;
+        align-items: center;
+    }
+    .choices__list--single {
+        padding: 0 !important;
+        color: #212529;
+    }
+    .choices__input {
+        background-color: #ffffff !important;
+        font-size: 14px !important;
+    }
+    .choices__list--dropdown {
+        border-radius: 6px !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+        z-index: 1001;
+    }
+    .choices__list--dropdown .choices__item--selectable.is-highlighted {
+        background-color: #007bff !important;
+        color: #ffffff !important;
+    }
+</style>
+
+{% endblock %}
