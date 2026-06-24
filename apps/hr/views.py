@@ -61,9 +61,11 @@ class EmployeeLoginView(APIView):
                 'emp_id': employee.emp_id,
                 'name': employee.name,
                 'email': employee.email,
-                'department': employee.department,
+                'department': employee.department.id if employee.department else None,
+                'department_name': employee.department.name if employee.department else None,
                 'designation': employee.designation,
-                'branch': employee.branch,
+                'branch': employee.branch.id if employee.branch else None,
+                'branch_name': employee.branch.name if employee.branch else None,
                 'is_staff': employee.is_staff,
             }
         }, status=status.HTTP_200_OK)

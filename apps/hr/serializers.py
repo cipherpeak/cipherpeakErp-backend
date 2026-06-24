@@ -4,6 +4,8 @@ from .models import Employee, AttendanceRecord, LeaveRequest, EmpDocument
 
 class EmployeeSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True)
+    department_name = serializers.CharField(source='department.name', read_only=True, default=None)
+    branch_name = serializers.CharField(source='branch.name', read_only=True, default=None)
 
     class Meta:
         model = Employee
@@ -27,6 +29,9 @@ class EmployeeSerializer(serializers.ModelSerializer):
 
 
 class EmployeeListSerializer(serializers.ModelSerializer):
+    department_name = serializers.CharField(source='department.name', read_only=True, default=None)
+    branch_name = serializers.CharField(source='branch.name', read_only=True, default=None)
+
     class Meta:
         model = Employee
         fields = '__all__'

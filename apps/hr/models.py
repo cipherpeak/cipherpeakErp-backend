@@ -80,9 +80,21 @@ class Employee(AbstractBaseUser, PermissionsMixin):
     phone = models.CharField(max_length=50, blank=True, null=True)
     avatar_initials = models.CharField(max_length=10, blank=True, null=True)
     avatar_color = models.CharField(max_length=20, blank=True, null=True)
-    department = models.CharField(max_length=255, blank=True, null=True)
+    department = models.ForeignKey(
+        'organization.Department',
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name='employees',
+    )
     designation = models.CharField(max_length=255, blank=True, null=True)
-    branch = models.CharField(max_length=255, blank=True, null=True)
+    branch = models.ForeignKey(
+        'organization.Branch',
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name='employees',
+    )
     shift = models.CharField(max_length=100, blank=True, null=True)
     manager = models.CharField(max_length=255, blank=True, null=True)
     join_date = models.DateField(blank=True, null=True)

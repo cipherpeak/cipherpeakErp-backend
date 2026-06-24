@@ -31,30 +31,36 @@ class CompanyViewSet(viewsets.ViewSet):
     def create(self, request):
         serializer = CompanySerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        
-        company = services.create_company(serializer.validated_data)
-        return Response(CompanySerializer(company).data, status=status.HTTP_201_CREATED)
+        try:
+            company = services.create_company(serializer.validated_data)
+            return Response(CompanySerializer(company).data, status=status.HTTP_201_CREATED)
+        except ValueError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     def update(self, request, pk=None):
         company = get_object_or_404(Company, pk=pk)
         serializer = CompanySerializer(company, data=request.data)
         serializer.is_valid(raise_exception=True)
-        
-        updated_company = services.update_company(company, serializer.validated_data)
-        return Response(CompanySerializer(updated_company).data)
+        try:
+            updated_company = services.update_company(company, serializer.validated_data)
+            return Response(CompanySerializer(updated_company).data)
+        except ValueError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     def partial_update(self, request, pk=None):
         company = get_object_or_404(Company, pk=pk)
         serializer = CompanySerializer(company, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
-        
-        updated_company = services.update_company(company, serializer.validated_data)
-        return Response(CompanySerializer(updated_company).data)
+        try:
+            updated_company = services.update_company(company, serializer.validated_data)
+            return Response(CompanySerializer(updated_company).data)
+        except ValueError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, pk=None):
         company = get_object_or_404(Company, pk=pk)
-        services.deactivate_company(company)
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        updated_company = services.deactivate_company(company)
+        return Response(CompanySerializer(updated_company).data, status=status.HTTP_200_OK)
 
 
 # ===========================================================================
@@ -80,7 +86,6 @@ class BranchViewSet(viewsets.ViewSet):
     def create(self, request):
         serializer = BranchSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        
         try:
             branch = services.create_branch(serializer.validated_data)
             return Response(BranchSerializer(branch).data, status=status.HTTP_201_CREATED)
@@ -91,22 +96,26 @@ class BranchViewSet(viewsets.ViewSet):
         branch = get_object_or_404(Branch, pk=pk)
         serializer = BranchSerializer(branch, data=request.data)
         serializer.is_valid(raise_exception=True)
-        
-        updated_branch = services.update_branch(branch, serializer.validated_data)
-        return Response(BranchSerializer(updated_branch).data)
+        try:
+            updated_branch = services.update_branch(branch, serializer.validated_data)
+            return Response(BranchSerializer(updated_branch).data)
+        except ValueError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     def partial_update(self, request, pk=None):
         branch = get_object_or_404(Branch, pk=pk)
         serializer = BranchSerializer(branch, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
-        
-        updated_branch = services.update_branch(branch, serializer.validated_data)
-        return Response(BranchSerializer(updated_branch).data)
+        try:
+            updated_branch = services.update_branch(branch, serializer.validated_data)
+            return Response(BranchSerializer(updated_branch).data)
+        except ValueError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, pk=None):
         branch = get_object_or_404(Branch, pk=pk)
-        services.deactivate_branch(branch)
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        updated_branch = services.deactivate_branch(branch)
+        return Response(BranchSerializer(updated_branch).data, status=status.HTTP_200_OK)
 
 
 # ===========================================================================
@@ -132,7 +141,6 @@ class PlantViewSet(viewsets.ViewSet):
     def create(self, request):
         serializer = PlantSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        
         try:
             plant = services.create_plant(serializer.validated_data)
             return Response(PlantSerializer(plant).data, status=status.HTTP_201_CREATED)
@@ -143,22 +151,26 @@ class PlantViewSet(viewsets.ViewSet):
         plant = get_object_or_404(Plant, pk=pk)
         serializer = PlantSerializer(plant, data=request.data)
         serializer.is_valid(raise_exception=True)
-        
-        updated_plant = services.update_plant(plant, serializer.validated_data)
-        return Response(PlantSerializer(updated_plant).data)
+        try:
+            updated_plant = services.update_plant(plant, serializer.validated_data)
+            return Response(PlantSerializer(updated_plant).data)
+        except ValueError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     def partial_update(self, request, pk=None):
         plant = get_object_or_404(Plant, pk=pk)
         serializer = PlantSerializer(plant, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
-        
-        updated_plant = services.update_plant(plant, serializer.validated_data)
-        return Response(PlantSerializer(updated_plant).data)
+        try:
+            updated_plant = services.update_plant(plant, serializer.validated_data)
+            return Response(PlantSerializer(updated_plant).data)
+        except ValueError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, pk=None):
         plant = get_object_or_404(Plant, pk=pk)
-        services.deactivate_plant(plant)
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        updated_plant = services.deactivate_plant(plant)
+        return Response(PlantSerializer(updated_plant).data, status=status.HTTP_200_OK)
 
 
 # ===========================================================================
@@ -184,7 +196,6 @@ class DepartmentViewSet(viewsets.ViewSet):
     def create(self, request):
         serializer = DepartmentSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        
         try:
             department = services.create_department(serializer.validated_data)
             return Response(DepartmentSerializer(department).data, status=status.HTTP_201_CREATED)
@@ -195,19 +206,23 @@ class DepartmentViewSet(viewsets.ViewSet):
         department = get_object_or_404(Department, pk=pk)
         serializer = DepartmentSerializer(department, data=request.data)
         serializer.is_valid(raise_exception=True)
-        
-        updated_dept = services.update_department(department, serializer.validated_data)
-        return Response(DepartmentSerializer(updated_dept).data)
+        try:
+            updated_dept = services.update_department(department, serializer.validated_data)
+            return Response(DepartmentSerializer(updated_dept).data)
+        except ValueError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     def partial_update(self, request, pk=None):
         department = get_object_or_404(Department, pk=pk)
         serializer = DepartmentSerializer(department, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
-        
-        updated_dept = services.update_department(department, serializer.validated_data)
-        return Response(DepartmentSerializer(updated_dept).data)
+        try:
+            updated_dept = services.update_department(department, serializer.validated_data)
+            return Response(DepartmentSerializer(updated_dept).data)
+        except ValueError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, pk=None):
         department = get_object_or_404(Department, pk=pk)
-        services.deactivate_department(department)
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        updated_dept = services.deactivate_department(department)
+        return Response(DepartmentSerializer(updated_dept).data, status=status.HTTP_200_OK)
