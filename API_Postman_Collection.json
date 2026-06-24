@@ -1,0 +1,843 @@
+{
+  "info": {
+    "name": "PeakU ERP API",
+    "_postman_id": "peaku-erp-api",
+    "description": "Organization, HR & System Modules API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000"
+    }
+  ],
+  "item": [
+    {
+      "name": "ORGANIZATION",
+      "item": [
+        {
+          "name": "Companies",
+          "item": [
+            {
+              "name": "List Companies",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/organization/companies/"
+              }
+            },
+            {
+              "name": "Create Company",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/organization/companies/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Acme Corp\",\n  \"legal_name\": \"Acme Corporation Ltd\",\n  \"initials\": \"AC\",\n  \"industry\": \"Manufacturing\",\n  \"country\": \"UAE\",\n  \"trn\": \"100200300\",\n  \"phone\": \"+971501234567\",\n  \"email\": \"info@acme.com\",\n  \"address\": \"Dubai, UAE\",\n  \"established\": 2015,\n  \"status\": \"active\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Company",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/organization/companies/{{company_id}}/"
+              }
+            },
+            {
+              "name": "Update Company",
+              "request": {
+                "method": "PUT",
+                "url": "{{base_url}}/api/organization/companies/{{company_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Acme Corp Updated\",\n  \"legal_name\": \"Acme Corporation Ltd\",\n  \"initials\": \"AC\",\n  \"industry\": \"Manufacturing\",\n  \"country\": \"UAE\",\n  \"trn\": \"100200300\",\n  \"phone\": \"+971501234567\",\n  \"email\": \"info@acme.com\",\n  \"address\": \"Dubai, UAE\",\n  \"established\": 2015,\n  \"status\": \"active\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Patch Company",
+              "request": {
+                "method": "PATCH",
+                "url": "{{base_url}}/api/organization/companies/{{company_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"status\": \"inactive\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Company (Soft)",
+              "request": {
+                "method": "DELETE",
+                "url": "{{base_url}}/api/organization/companies/{{company_id}}/"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Branches",
+          "item": [
+            {
+              "name": "List Branches",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/organization/branches/"
+              }
+            },
+            {
+              "name": "Create Branch",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/organization/branches/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"company\": 1,\n  \"name\": \"Dubai Branch\",\n  \"city\": \"Dubai\",\n  \"country\": \"UAE\",\n  \"address\": \"Sheikh Zayed Road\",\n  \"phone\": \"+971501234567\",\n  \"email\": \"dubai@acme.com\",\n  \"branch_head\": \"Ahmed Ali\",\n  \"employee_count\": 50,\n  \"dept_count\": 5,\n  \"status\": \"active\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Branch",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/organization/branches/{{branch_id}}/"
+              }
+            },
+            {
+              "name": "Update Branch",
+              "request": {
+                "method": "PUT",
+                "url": "{{base_url}}/api/organization/branches/{{branch_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"company\": 1,\n  \"name\": \"Dubai Branch Updated\",\n  \"city\": \"Dubai\",\n  \"country\": \"UAE\",\n  \"address\": \"Sheikh Zayed Road\",\n  \"phone\": \"+971501234567\",\n  \"email\": \"dubai@acme.com\",\n  \"branch_head\": \"Ahmed Ali\",\n  \"employee_count\": 55,\n  \"dept_count\": 6,\n  \"status\": \"active\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Branch (Soft)",
+              "request": {
+                "method": "DELETE",
+                "url": "{{base_url}}/api/organization/branches/{{branch_id}}/"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Plants",
+          "item": [
+            {
+              "name": "List Plants",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/organization/plants/"
+              }
+            },
+            {
+              "name": "Create Plant",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/organization/plants/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"branch\": 1,\n  \"name\": \"Main Factory\",\n  \"type\": \"Manufacturing\",\n  \"address\": \"Industrial Area, Dubai\",\n  \"status\": \"active\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Plant",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/organization/plants/{{plant_id}}/"
+              }
+            },
+            {
+              "name": "Update Plant",
+              "request": {
+                "method": "PUT",
+                "url": "{{base_url}}/api/organization/plants/{{plant_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"branch\": 1,\n  \"name\": \"Main Factory Updated\",\n  \"type\": \"Assembly\",\n  \"address\": \"Industrial Area, Dubai\",\n  \"status\": \"active\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Plant (Soft)",
+              "request": {
+                "method": "DELETE",
+                "url": "{{base_url}}/api/organization/plants/{{plant_id}}/"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Departments",
+          "item": [
+            {
+              "name": "List Departments",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/organization/departments/"
+              }
+            },
+            {
+              "name": "Create Department",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/organization/departments/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Engineering\",\n  \"head\": \"John Smith\",\n  \"branch\": 1,\n  \"employee_count\": 20,\n  \"status\": \"active\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Department",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/organization/departments/{{department_id}}/"
+              }
+            },
+            {
+              "name": "Update Department",
+              "request": {
+                "method": "PUT",
+                "url": "{{base_url}}/api/organization/departments/{{department_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Engineering Updated\",\n  \"head\": \"John Smith\",\n  \"branch\": 1,\n  \"employee_count\": 25,\n  \"status\": \"active\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Department (Soft)",
+              "request": {
+                "method": "DELETE",
+                "url": "{{base_url}}/api/organization/departments/{{department_id}}/"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "HR",
+      "item": [
+        {
+          "name": "Employees",
+          "item": [
+            {
+              "name": "List Employees",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/hr/employees/"
+              }
+            },
+            {
+              "name": "Create Employee",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/hr/employees/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"emp_id\": \"EMP001\",\n  \"password\": \"password123\",\n  \"name\": \"John Doe\",\n  \"email\": \"john@acme.com\",\n  \"phone\": \"+971501234567\",\n  \"avatar_initials\": \"JD\",\n  \"avatar_color\": \"#3B82F6\",\n  \"department\": \"Engineering\",\n  \"designation\": \"Senior Developer\",\n  \"branch\": \"Dubai Branch\",\n  \"shift\": \"Morning\",\n  \"manager\": \"Jane Smith\",\n  \"join_date\": \"2024-01-15\",\n  \"nationality\": \"Indian\",\n  \"gender\": \"male\",\n  \"status\": \"active\",\n  \"is_staff\": false\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Employee",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/hr/employees/{{employee_id}}/"
+              }
+            },
+            {
+              "name": "Update Employee",
+              "request": {
+                "method": "PUT",
+                "url": "{{base_url}}/api/hr/employees/{{employee_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"emp_id\": \"EMP001\",\n  \"name\": \"John Doe Updated\",\n  \"email\": \"john@acme.com\",\n  \"phone\": \"+971501234567\",\n  \"department\": \"Engineering\",\n  \"designation\": \"Lead Developer\",\n  \"branch\": \"Dubai Branch\",\n  \"shift\": \"Morning\",\n  \"manager\": \"Jane Smith\",\n  \"join_date\": \"2024-01-15\",\n  \"nationality\": \"Indian\",\n  \"gender\": \"male\",\n  \"status\": \"active\",\n  \"is_staff\": false\n}"
+                }
+              }
+            },
+            {
+              "name": "Patch Employee",
+              "request": {
+                "method": "PATCH",
+                "url": "{{base_url}}/api/hr/employees/{{employee_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"status\": \"inactive\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Employee (Soft)",
+              "request": {
+                "method": "DELETE",
+                "url": "{{base_url}}/api/hr/employees/{{employee_id}}/"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Attendance",
+          "item": [
+            {
+              "name": "List Attendance",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/hr/attendance/"
+              }
+            },
+            {
+              "name": "Create Attendance",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/hr/attendance/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"employee\": 1,\n  \"date\": \"2024-06-24\",\n  \"check_in\": \"2024-06-24T09:00:00Z\",\n  \"check_out\": \"2024-06-24T17:00:00Z\",\n  \"status\": \"present\",\n  \"hours_worked\": 8.00,\n  \"overtime_hours\": 0,\n  \"remarks\": \"Regular day\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Attendance",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/hr/attendance/{{attendance_id}}/"
+              }
+            },
+            {
+              "name": "Update Attendance",
+              "request": {
+                "method": "PUT",
+                "url": "{{base_url}}/api/hr/attendance/{{attendance_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"employee\": 1,\n  \"date\": \"2024-06-24\",\n  \"check_in\": \"2024-06-24T09:00:00Z\",\n  \"check_out\": \"2024-06-24T18:00:00Z\",\n  \"status\": \"present\",\n  \"hours_worked\": 9.00,\n  \"overtime_hours\": 1.00,\n  \"remarks\": \"Worked extra\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Attendance",
+              "request": {
+                "method": "DELETE",
+                "url": "{{base_url}}/api/hr/attendance/{{attendance_id}}/"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Leave Requests",
+          "item": [
+            {
+              "name": "List Leave Requests",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/hr/leave-requests/"
+              }
+            },
+            {
+              "name": "Create Leave Request",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/hr/leave-requests/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"employee\": 1,\n  \"type\": \"annual\",\n  \"start_date\": \"2024-07-01\",\n  \"end_date\": \"2024-07-05\",\n  \"days\": 5.0,\n  \"reason\": \"Family vacation\",\n  \"status\": \"pending\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Leave Request",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/hr/leave-requests/{{leave_id}}/"
+              }
+            },
+            {
+              "name": "Update Leave Request",
+              "request": {
+                "method": "PUT",
+                "url": "{{base_url}}/api/hr/leave-requests/{{leave_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"employee\": 1,\n  \"type\": \"annual\",\n  \"start_date\": \"2024-07-01\",\n  \"end_date\": \"2024-07-05\",\n  \"days\": 5.0,\n  \"reason\": \"Family vacation\",\n  \"status\": \"approved\",\n  \"approved_by\": \"Jane Smith\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Patch Leave Status",
+              "request": {
+                "method": "PATCH",
+                "url": "{{base_url}}/api/hr/leave-requests/{{leave_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"status\": \"approved\",\n  \"approved_by\": \"Jane Smith\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Leave Request",
+              "request": {
+                "method": "DELETE",
+                "url": "{{base_url}}/api/hr/leave-requests/{{leave_id}}/"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Documents",
+          "item": [
+            {
+              "name": "List Documents",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/hr/documents/"
+              }
+            },
+            {
+              "name": "Create Document",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/hr/documents/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"employee\": 1,\n  \"type\": \"visa\",\n  \"document_number\": \"V12345678\",\n  \"issue_date\": \"2024-01-01\",\n  \"expiry_date\": \"2026-01-01\",\n  \"file_name\": \"visa.pdf\",\n  \"status\": \"valid\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Document",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/hr/documents/{{document_id}}/"
+              }
+            },
+            {
+              "name": "Update Document",
+              "request": {
+                "method": "PUT",
+                "url": "{{base_url}}/api/hr/documents/{{document_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"employee\": 1,\n  \"type\": \"visa\",\n  \"document_number\": \"V12345678\",\n  \"issue_date\": \"2024-01-01\",\n  \"expiry_date\": \"2026-01-01\",\n  \"file_name\": \"visa_updated.pdf\",\n  \"status\": \"valid\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Document",
+              "request": {
+                "method": "DELETE",
+                "url": "{{base_url}}/api/hr/documents/{{document_id}}/"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SYSTEM",
+      "item": [
+        {
+          "name": "Roles",
+          "item": [
+            {
+              "name": "List Roles",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/system/roles/"
+              }
+            },
+            {
+              "name": "Create Role",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/system/roles/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Admin\",\n  \"description\": \"Full system access\",\n  \"permissions\": [\"read\", \"write\", \"delete\", \"approve\"],\n  \"user_count\": 0,\n  \"is_system\": true\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Role",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/system/roles/{{role_id}}/"
+              }
+            },
+            {
+              "name": "Update Role",
+              "request": {
+                "method": "PUT",
+                "url": "{{base_url}}/api/system/roles/{{role_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Admin Updated\",\n  \"description\": \"Full system access\",\n  \"permissions\": [\"read\", \"write\", \"delete\", \"approve\"],\n  \"user_count\": 5,\n  \"is_system\": true\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Role",
+              "request": {
+                "method": "DELETE",
+                "url": "{{base_url}}/api/system/roles/{{role_id}}/"
+              }
+            }
+          ]
+        },
+        {
+          "name": "System Users",
+          "item": [
+            {
+              "name": "List System Users",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/system/users/"
+              }
+            },
+            {
+              "name": "Create System User",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/system/users/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Admin User\",\n  \"email\": \"admin@acme.com\",\n  \"password_hash\": \"admin123\",\n  \"role\": 1,\n  \"branch\": \"Dubai Branch\",\n  \"department\": \"IT\",\n  \"status\": \"active\",\n  \"two_fa\": false,\n  \"avatar_initials\": \"AU\",\n  \"avatar_color\": \"#10B981\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get System User",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/system/users/{{system_user_id}}/"
+              }
+            },
+            {
+              "name": "Update System User",
+              "request": {
+                "method": "PUT",
+                "url": "{{base_url}}/api/system/users/{{system_user_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Admin User Updated\",\n  \"email\": \"admin@acme.com\",\n  \"role\": 1,\n  \"branch\": \"Dubai Branch\",\n  \"department\": \"IT\",\n  \"status\": \"active\",\n  \"two_fa\": true,\n  \"avatar_initials\": \"AU\",\n  \"avatar_color\": \"#10B981\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Patch System User",
+              "request": {
+                "method": "PATCH",
+                "url": "{{base_url}}/api/system/users/{{system_user_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"status\": \"inactive\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete System User (Soft)",
+              "request": {
+                "method": "DELETE",
+                "url": "{{base_url}}/api/system/users/{{system_user_id}}/"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Approval Workflows",
+          "item": [
+            {
+              "name": "List Workflows",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/system/workflows/"
+              }
+            },
+            {
+              "name": "Create Workflow",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/system/workflows/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"module\": \"purchase_order\",\n  \"step_order\": 1,\n  \"approver_role\": \"Manager\",\n  \"threshold\": 10000.00,\n  \"auto_approve_under\": 500.00,\n  \"status\": \"active\",\n  \"current_pending\": 0\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Workflow",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/system/workflows/{{workflow_id}}/"
+              }
+            },
+            {
+              "name": "Update Workflow",
+              "request": {
+                "method": "PUT",
+                "url": "{{base_url}}/api/system/workflows/{{workflow_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"module\": \"purchase_order\",\n  \"step_order\": 1,\n  \"approver_role\": \"Director\",\n  \"threshold\": 15000.00,\n  \"auto_approve_under\": 1000.00,\n  \"status\": \"active\",\n  \"current_pending\": 2\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Workflow",
+              "request": {
+                "method": "DELETE",
+                "url": "{{base_url}}/api/system/workflows/{{workflow_id}}/"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delegations",
+          "item": [
+            {
+              "name": "List Delegations",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/system/delegations/"
+              }
+            },
+            {
+              "name": "Create Delegation",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/system/delegations/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"from_user\": 1,\n  \"to_user\": 2,\n  \"start_date\": \"2024-07-01\",\n  \"end_date\": \"2024-07-15\",\n  \"reason\": \"Vacation coverage\",\n  \"status\": \"active\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Delegation",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/system/delegations/{{delegation_id}}/"
+              }
+            },
+            {
+              "name": "Update Delegation",
+              "request": {
+                "method": "PUT",
+                "url": "{{base_url}}/api/system/delegations/{{delegation_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"from_user\": 1,\n  \"to_user\": 2,\n  \"start_date\": \"2024-07-01\",\n  \"end_date\": \"2024-07-20\",\n  \"reason\": \"Extended vacation coverage\",\n  \"status\": \"active\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Delegation",
+              "request": {
+                "method": "DELETE",
+                "url": "{{base_url}}/api/system/delegations/{{delegation_id}}/"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login Events",
+          "item": [
+            {
+              "name": "List Login Events",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/system/login-events/"
+              }
+            },
+            {
+              "name": "Create Login Event",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/system/login-events/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"user\": 1,\n  \"user_name\": \"Admin User\",\n  \"ip\": \"192.168.1.100\",\n  \"device\": \"Windows PC\",\n  \"location\": \"Dubai, UAE\",\n  \"status\": \"success\",\n  \"method\": \"password\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Login Event",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/system/login-events/{{login_event_id}}/"
+              }
+            },
+            {
+              "name": "Delete Login Event",
+              "request": {
+                "method": "DELETE",
+                "url": "{{base_url}}/api/system/login-events/{{login_event_id}}/"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Device Sessions",
+          "item": [
+            {
+              "name": "List Device Sessions",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/system/device-sessions/"
+              }
+            },
+            {
+              "name": "Create Device Session",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/system/device-sessions/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"user\": 1,\n  \"user_name\": \"Admin User\",\n  \"device\": \"Windows PC\",\n  \"browser\": \"Chrome 125\",\n  \"ip\": \"192.168.1.100\",\n  \"location\": \"Dubai, UAE\",\n  \"last_active\": \"2024-06-24T10:30:00Z\",\n  \"status\": \"active\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Device Session",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/system/device-sessions/{{session_id}}/"
+              }
+            },
+            {
+              "name": "Update Device Session",
+              "request": {
+                "method": "PUT",
+                "url": "{{base_url}}/api/system/device-sessions/{{session_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"user\": 1,\n  \"user_name\": \"Admin User\",\n  \"device\": \"Windows PC\",\n  \"browser\": \"Chrome 125\",\n  \"ip\": \"192.168.1.100\",\n  \"location\": \"Dubai, UAE\",\n  \"last_active\": \"2024-06-24T11:00:00Z\",\n  \"status\": \"active\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Patch Device Session",
+              "request": {
+                "method": "PATCH",
+                "url": "{{base_url}}/api/system/device-sessions/{{session_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"status\": \"expired\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Device Session",
+              "request": {
+                "method": "DELETE",
+                "url": "{{base_url}}/api/system/device-sessions/{{session_id}}/"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 
 
 # ---------------------------------------------------------------------------
@@ -46,12 +47,32 @@ class DocumentStatus(models.TextChoices):
 
 
 # ---------------------------------------------------------------------------
-# Employee
+# Custom User Manager
 # ---------------------------------------------------------------------------
 
-class Employee(models.Model):
+class EmployeeManager(BaseUserManager):
+    def create_user(self, emp_id, password=None, **extra_fields):
+        if not emp_id:
+            raise ValueError('Employee ID is required')
+        user = self.model(emp_id=emp_id, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, emp_id, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault('is_active', True)
+        return self.create_user(emp_id, password, **extra_fields)
+
+
+# ---------------------------------------------------------------------------
+# Employee (Custom User Model)
+# ---------------------------------------------------------------------------
+
+class Employee(AbstractBaseUser, PermissionsMixin):
     """
-    Core employee record.
+    Core employee record - serves as the custom user model.
     """
     emp_id = models.CharField(max_length=50, unique=True)
     name = models.CharField(max_length=255)
@@ -72,8 +93,15 @@ class Employee(models.Model):
         choices=EmpStatus.choices,
         default=EmpStatus.ACTIVE,
     )
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    objects = EmployeeManager()
+
+    USERNAME_FIELD = 'emp_id'
+    REQUIRED_FIELDS = ['name']
 
     class Meta:
         verbose_name = 'Employee'

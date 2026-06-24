@@ -11,5 +11,6 @@ router.register(r'documents', views.EmpDocumentViewSet, basename='document')
 
 # The API URLs are now determined automatically by the router.
 urlpatterns = [
+    path('login/', views.EmployeeLoginView.as_view(), name='employee-login'),
     path('', include(router.urls)),
 ]

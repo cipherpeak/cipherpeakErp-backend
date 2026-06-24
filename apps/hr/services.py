@@ -11,17 +11,28 @@ def get_all_employees() -> List[Employee]:
     return Employee.objects.all()
 
 def create_employee(data: Dict[str, Any]) -> Employee:
-    return Employee.objects.create(**data)
+    password = data.pop('password', None)
+    employee = Employee(**data)
+    if password:
+        employee.set_password(password)
+    else:
+        employee.set_unusable_password()
+    employee.save()
+    return employee
 
 def update_employee(employee: Employee, data: Dict[str, Any]) -> Employee:
+    password = data.pop('password', None)
     for field, value in data.items():
         setattr(employee, field, value)
+    if password:
+        employee.set_password(password)
     employee.save()
     return employee
 
 def deactivate_employee(employee: Employee) -> Employee:
     """Soft deletes the employee."""
     employee.status = EmpStatus.INACTIVE
+    employee.is_active = False
     employee.save()
     return employee
 
