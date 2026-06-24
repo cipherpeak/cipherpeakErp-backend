@@ -10,13 +10,6 @@ class CompanyStatus(models.TextChoices):
     INACTIVE = 'inactive', 'Inactive'
 
 
-class EmpStatus(models.TextChoices):
-    ACTIVE = 'active', 'Active'
-    INACTIVE = 'inactive', 'Inactive'
-    ON_LEAVE = 'on_leave', 'On Leave'
-    TERMINATED = 'terminated', 'Terminated'
-
-
 # ---------------------------------------------------------------------------
 # Company
 # ---------------------------------------------------------------------------
