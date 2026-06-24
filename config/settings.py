@@ -82,6 +82,7 @@ INSTALLED_APPS = [
     'apps.home',
     'apps.dashboard',
     'apps.office',
+    'apps.organization',
 ]
 
 from datetime import timedelta
