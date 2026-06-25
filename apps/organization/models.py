@@ -116,6 +116,8 @@ class Plant(models.Model):
         blank=True,
         null=True,
     )
+    plant_manager = models.CharField(max_length=255, blank=True, null=True)
+    capacity = models.IntegerField(default=0)
     address = models.TextField(blank=True, null=True)
     status = models.CharField(
         max_length=20,
@@ -248,6 +250,7 @@ class Team(models.Model):
         choices=CompanyStatus.choices,
         default=CompanyStatus.ACTIVE,
     )
+    description = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -269,11 +272,24 @@ class Shift(models.Model):
     A work shift definition (time window + working days).
     Mirrors the ``shifts`` SQL table.
     """
+
+    SHIFT_TYPE_CHOICES = [
+        ('fixed', 'Fixed'),
+        ('rotational', 'Rotational'),
+        ('flexible', 'Flexible'),
+    ]
+
     name = models.CharField(max_length=100)
     start_time = models.TimeField(blank=True, null=True)
     end_time = models.TimeField(blank=True, null=True)
     # Comma-separated day names, e.g. "Mon,Tue,Wed,Thu,Fri"
     days = models.CharField(max_length=100, blank=True, null=True)
+    break_duration = models.IntegerField(default=0, help_text='Break duration in minutes')
+    shift_type = models.CharField(
+        max_length=20,
+        choices=SHIFT_TYPE_CHOICES,
+        default='fixed',
+    )
     status = models.CharField(
         max_length=20,
         choices=CompanyStatus.choices,

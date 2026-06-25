@@ -1,6 +1,6 @@
 from django.db import transaction
 from typing import Dict, Any, List
-from .models import Company, Branch, CompanyStatus, Plant, Department
+from .models import Company, Branch, CompanyStatus, Plant, Department, Designation, Team, Shift
 
 # ===========================================================================
 # COMPANY SERVICES
@@ -167,3 +167,81 @@ def deactivate_department(department: Department) -> Department:
 def delete_department(department: Department) -> None:
     """Hard deletes the department from the database."""
     department.delete()
+
+
+# ===========================================================================
+# DESIGNATION SERVICES
+# ===========================================================================
+
+def get_all_designations() -> List[Designation]:
+    return Designation.objects.all()
+
+def create_designation(data: Dict[str, Any]) -> Designation:
+    title = data.get('title')
+    if Designation.objects.filter(title__iexact=title).exists():
+        raise ValueError(f"Designation with title '{title}' already exists.")
+    return Designation.objects.create(**data)
+
+def update_designation(designation: Designation, data: Dict[str, Any]) -> Designation:
+    title = data.get('title')
+    if title and Designation.objects.filter(title__iexact=title).exclude(id=designation.id).exists():
+        raise ValueError(f"Designation with title '{title}' already exists.")
+    for field, value in data.items():
+        setattr(designation, field, value)
+    designation.save()
+    return designation
+
+def delete_designation(designation: Designation) -> None:
+    designation.delete()
+
+
+# ===========================================================================
+# TEAM SERVICES
+# ===========================================================================
+
+def get_all_teams() -> List[Team]:
+    return Team.objects.all()
+
+def create_team(data: Dict[str, Any]) -> Team:
+    name = data.get('name')
+    if Team.objects.filter(name__iexact=name).exists():
+        raise ValueError(f"Team with name '{name}' already exists.")
+    return Team.objects.create(**data)
+
+def update_team(team: Team, data: Dict[str, Any]) -> Team:
+    name = data.get('name')
+    if name and Team.objects.filter(name__iexact=name).exclude(id=team.id).exists():
+        raise ValueError(f"Team with name '{name}' already exists.")
+    for field, value in data.items():
+        setattr(team, field, value)
+    team.save()
+    return team
+
+def delete_team(team: Team) -> None:
+    team.delete()
+
+
+# ===========================================================================
+# SHIFT SERVICES
+# ===========================================================================
+
+def get_all_shifts() -> List[Shift]:
+    return Shift.objects.all()
+
+def create_shift(data: Dict[str, Any]) -> Shift:
+    name = data.get('name')
+    if Shift.objects.filter(name__iexact=name).exists():
+        raise ValueError(f"Shift with name '{name}' already exists.")
+    return Shift.objects.create(**data)
+
+def update_shift(shift: Shift, data: Dict[str, Any]) -> Shift:
+    name = data.get('name')
+    if name and Shift.objects.filter(name__iexact=name).exclude(id=shift.id).exists():
+        raise ValueError(f"Shift with name '{name}' already exists.")
+    for field, value in data.items():
+        setattr(shift, field, value)
+    shift.save()
+    return shift
+
+def delete_shift(shift: Shift) -> None:
+    shift.delete()

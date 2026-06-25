@@ -19,14 +19,11 @@ class CompanySerializer(serializers.ModelSerializer):
 
 
 class BranchSerializer(serializers.ModelSerializer):
-    employee_count = serializers.SerializerMethodField()
+    company_name = serializers.CharField(source='company.name', read_only=True)
 
     class Meta:
         model = Branch
         fields = '__all__'
-
-    def get_employee_count(self, obj):
-        return obj.employees.count()
 
 
 class PlantSerializer(serializers.ModelSerializer):
@@ -36,14 +33,11 @@ class PlantSerializer(serializers.ModelSerializer):
 
 
 class DepartmentSerializer(serializers.ModelSerializer):
-    employee_count = serializers.SerializerMethodField()
-
     class Meta:
         model = Department
         fields = '__all__'
 
-    def get_employee_count(self, obj):
-        return obj.employees.count()
+
 
 
 class DesignationSerializer(serializers.ModelSerializer):

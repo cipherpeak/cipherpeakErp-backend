@@ -244,6 +244,210 @@
               }
             }
           ]
+        },
+        {
+          "name": "Designations",
+          "item": [
+            {
+              "name": "List Designations",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/organization/designations/"
+              }
+            },
+            {
+              "name": "Create Designation",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/organization/designations/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"Senior Developer\",\n  \"department\": \"Engineering\",\n  \"level\": \"Senior\",\n  \"grade\": \"L4\",\n  \"min_salary\": 80000,\n  \"max_salary\": 120000,\n  \"status\": \"active\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Designation",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/organization/designations/{{designation_id}}/"
+              }
+            },
+            {
+              "name": "Update Designation",
+              "request": {
+                "method": "PUT",
+                "url": "{{base_url}}/api/organization/designations/{{designation_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"Lead Developer\",\n  \"department\": \"Engineering\",\n  \"level\": \"Lead\",\n  \"grade\": \"L5\",\n  \"min_salary\": 100000,\n  \"max_salary\": 150000,\n  \"status\": \"active\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Patch Designation",
+              "request": {
+                "method": "PATCH",
+                "url": "{{base_url}}/api/organization/designations/{{designation_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"status\": \"inactive\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Designation",
+              "request": {
+                "method": "DELETE",
+                "url": "{{base_url}}/api/organization/designations/{{designation_id}}/"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Teams",
+          "item": [
+            {
+              "name": "List Teams",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/organization/teams/"
+              }
+            },
+            {
+              "name": "Create Team",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/organization/teams/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Engineering Team\",\n  \"department\": \"Engineering\",\n  \"lead\": \"John Smith\",\n  \"member_count\": 10,\n  \"status\": \"active\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Team",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/organization/teams/{{team_id}}/"
+              }
+            },
+            {
+              "name": "Update Team",
+              "request": {
+                "method": "PUT",
+                "url": "{{base_url}}/api/organization/teams/{{team_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Backend Team\",\n  \"department\": \"Engineering\",\n  \"lead\": \"Jane Doe\",\n  \"member_count\": 8,\n  \"status\": \"active\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Patch Team",
+              "request": {
+                "method": "PATCH",
+                "url": "{{base_url}}/api/organization/teams/{{team_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"status\": \"inactive\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Team",
+              "request": {
+                "method": "DELETE",
+                "url": "{{base_url}}/api/organization/teams/{{team_id}}/"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Shifts",
+          "item": [
+            {
+              "name": "List Shifts",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/organization/shifts/"
+              }
+            },
+            {
+              "name": "Create Shift",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/organization/shifts/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Morning Shift\",\n  \"start_time\": \"08:00:00\",\n  \"end_time\": \"16:00:00\",\n  \"days\": \"Mon,Tue,Wed,Thu,Fri\",\n  \"status\": \"active\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Shift",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/organization/shifts/{{shift_id}}/"
+              }
+            },
+            {
+              "name": "Update Shift",
+              "request": {
+                "method": "PUT",
+                "url": "{{base_url}}/api/organization/shifts/{{shift_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Evening Shift\",\n  \"start_time\": \"14:00:00\",\n  \"end_time\": \"22:00:00\",\n  \"days\": \"Mon,Tue,Wed,Thu,Fri\",\n  \"status\": \"active\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Patch Shift",
+              "request": {
+                "method": "PATCH",
+                "url": "{{base_url}}/api/organization/shifts/{{shift_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"status\": \"inactive\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Shift",
+              "request": {
+                "method": "DELETE",
+                "url": "{{base_url}}/api/organization/shifts/{{shift_id}}/"
+              }
+            }
+          ]
         }
       ]
     },
