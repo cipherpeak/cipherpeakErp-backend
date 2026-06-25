@@ -277,3 +277,24 @@ def update_cost_center(cost_center: CostCenter, data: Dict[str, Any]) -> CostCen
 
 def delete_cost_center(cost_center: CostCenter) -> None:
     cost_center.delete()
+
+
+# ===========================================================================
+# ORG CHART SERVICES
+# ===========================================================================
+
+def get_org_chart() -> List[Company]:
+    """Get all active companies for org chart (tree loaded via serializers)."""
+    return Company.objects.filter(status='active')
+
+def get_company_children(company_id: int) -> List[Branch]:
+    """Get active branches for a company."""
+    return Branch.objects.filter(company_id=company_id, status='active')
+
+def get_branch_children(branch_id: int) -> List[Department]:
+    """Get active departments for a branch."""
+    return Department.objects.filter(branch_id=branch_id, status='active')
+
+def get_department_children(department_name: str) -> List[Team]:
+    """Get active teams for a department (matched by name)."""
+    return Team.objects.filter(department=department_name, status='active')

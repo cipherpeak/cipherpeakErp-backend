@@ -7,6 +7,7 @@ from .models import Company, Branch, Plant, Department, Designation, Team, Shift
 from .serializers import (
     CompanySerializer, BranchSerializer, PlantSerializer, DepartmentSerializer,
     DesignationSerializer, TeamSerializer, ShiftSerializer, CostCenterSerializer,
+    OrgChartCompanySerializer, OrgChartBranchSerializer, OrgChartDepartmentSerializer, OrgChartTeamSerializer,
 )
 from . import services
 
@@ -449,3 +450,39 @@ class CostCenterViewSet(viewsets.ViewSet):
         cost_center = get_object_or_404(CostCenter, pk=pk)
         services.delete_cost_center(cost_center)
         return Response({"message": "Cost center deleted successfully."}, status=status.HTTP_200_OK)
+
+
+# ===========================================================================
+# ORG CHART VIEWSET
+# ===========================================================================
+
+class OrgChartViewSet(viewsets.ViewSet):
+    """
+    API endpoint for Org Chart hierarchy.
+    - list: Full tree (companies → branches → departments → teams)
+    - retrieve: Children of a specific node
+    """
+    permission_classes = [IsAuthenticated]
+
+    def list(self, request):
+        companies = services.get_org_chart()
+        serializer = OrgChartCompanySerializer(companies, many=True)
+        return Response(serializer.data)
+
+    def retrieve(self, request, pk=None):
+        node_type = request.query_params.get('type', 'company')
+
+        if node_type == 'company':
+            branches = services.get_company_children(int(pk))
+            serializer = OrgChartBranchSerializer(branches, many=True)
+        elif node_type == 'branch':
+            departments = services.get_branch_children(int(pk))
+            serializer = OrgChartDepartmentSerializer(departments, many=True)
+        elif node_type == 'department':
+            department = Department.objects.get(pk=pk)
+            teams = services.get_department_children(department.name)
+            serializer = OrgChartTeamSerializer(teams, many=True)
+        else:
+            return Response({"error": "Invalid type. Use: company, branch, or department"}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(serializer.data)

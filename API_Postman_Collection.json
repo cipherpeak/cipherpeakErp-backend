@@ -516,6 +516,39 @@
               }
             }
           ]
+        },
+        {
+          "name": "Org Chart",
+          "item": [
+            {
+              "name": "Get Full Org Chart",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/organization/org-chart/"
+              }
+            },
+            {
+              "name": "Get Company Children (Branches)",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/organization/org-chart/{{company_id}}/?type=company"
+              }
+            },
+            {
+              "name": "Get Branch Children (Departments)",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/organization/org-chart/{{branch_id}}/?type=branch"
+              }
+            },
+            {
+              "name": "Get Department Children (Teams)",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/organization/org-chart/{{department_id}}/?type=department"
+              }
+            }
+          ]
         }
       ]
     },
