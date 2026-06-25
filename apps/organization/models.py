@@ -305,3 +305,48 @@ class Shift(models.Model):
 
     def __str__(self):
         return self.name
+
+
+# ---------------------------------------------------------------------------
+# Cost Center
+# ---------------------------------------------------------------------------
+
+class CostCenter(models.Model):
+    """
+    A financial cost centre for budgeting and expense tracking.
+    Mirrors the ``cost_centers`` SQL table.
+    """
+
+    COST_CENTER_TYPE_CHOICES = [
+        ('revenue', 'Revenue'),
+        ('cost', 'Cost'),
+        ('profit', 'Profit'),
+    ]
+
+    code = models.CharField(max_length=30, unique=True)
+    name = models.CharField(max_length=200)
+    type = models.CharField(max_length=20, choices=COST_CENTER_TYPE_CHOICES)
+    owner = models.ForeignKey(
+        'hr.Employee',
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name='owned_cost_centers',
+    )
+    budget = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    spent = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    status = models.CharField(
+        max_length=20,
+        choices=CompanyStatus.choices,
+        default=CompanyStatus.ACTIVE,
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'Cost Center'
+        verbose_name_plural = 'Cost Centers'
+        ordering = ['code']
+
+    def __str__(self):
+        return f"{self.code} - {self.name}"

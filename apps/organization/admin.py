@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Company, Branch, Plant, Department, Designation, Team, Shift
+from .models import Company, Branch, Plant, Department, Designation, Team, Shift, CostCenter
 
 
 @admin.register(Company)
@@ -49,3 +49,10 @@ class ShiftAdmin(admin.ModelAdmin):
     list_display = ('name', 'start_time', 'end_time', 'days', 'status', 'created_at')
     search_fields = ('name',)
     list_filter = ('status',)
+
+
+@admin.register(CostCenter)
+class CostCenterAdmin(admin.ModelAdmin):
+    list_display = ('code', 'name', 'type', 'owner', 'budget', 'spent', 'status', 'created_at')
+    search_fields = ('code', 'name')
+    list_filter = ('status', 'type')

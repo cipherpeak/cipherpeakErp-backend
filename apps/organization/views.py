@@ -3,10 +3,10 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 
-from .models import Company, Branch, Plant, Department, Designation, Team, Shift
+from .models import Company, Branch, Plant, Department, Designation, Team, Shift, CostCenter
 from .serializers import (
     CompanySerializer, BranchSerializer, PlantSerializer, DepartmentSerializer,
-    DesignationSerializer, TeamSerializer, ShiftSerializer,
+    DesignationSerializer, TeamSerializer, ShiftSerializer, CostCenterSerializer,
 )
 from . import services
 
@@ -394,3 +394,58 @@ class ShiftViewSet(viewsets.ViewSet):
         shift = get_object_or_404(Shift, pk=pk)
         services.delete_shift(shift)
         return Response({"message": "Shift deleted successfully."}, status=status.HTTP_200_OK)
+
+
+# ===========================================================================
+# COST CENTER VIEWSET
+# ===========================================================================
+
+class CostCenterViewSet(viewsets.ViewSet):
+    """
+    API endpoint that allows Cost Centers to be viewed or edited.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def list(self, request):
+        cost_centers = services.get_all_cost_centers()
+        serializer = CostCenterSerializer(cost_centers, many=True)
+        return Response(serializer.data)
+
+    def retrieve(self, request, pk=None):
+        cost_center = get_object_or_404(CostCenter, pk=pk)
+        serializer = CostCenterSerializer(cost_center)
+        return Response(serializer.data)
+
+    def create(self, request):
+        serializer = CostCenterSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        try:
+            services.create_cost_center(serializer.validated_data)
+            return Response({"message": "Cost center created successfully."}, status=status.HTTP_201_CREATED)
+        except ValueError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+    def update(self, request, pk=None):
+        cost_center = get_object_or_404(CostCenter, pk=pk)
+        serializer = CostCenterSerializer(cost_center, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        try:
+            services.update_cost_center(cost_center, serializer.validated_data)
+            return Response({"message": "Cost center updated successfully."}, status=status.HTTP_200_OK)
+        except ValueError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+    def partial_update(self, request, pk=None):
+        cost_center = get_object_or_404(CostCenter, pk=pk)
+        serializer = CostCenterSerializer(cost_center, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        try:
+            services.update_cost_center(cost_center, serializer.validated_data)
+            return Response({"message": "Cost center updated successfully."}, status=status.HTTP_200_OK)
+        except ValueError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+    def destroy(self, request, pk=None):
+        cost_center = get_object_or_404(CostCenter, pk=pk)
+        services.delete_cost_center(cost_center)
+        return Response({"message": "Cost center deleted successfully."}, status=status.HTTP_200_OK)

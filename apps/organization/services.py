@@ -1,6 +1,6 @@
 from django.db import transaction
 from typing import Dict, Any, List
-from .models import Company, Branch, CompanyStatus, Plant, Department, Designation, Team, Shift
+from .models import Company, Branch, CompanyStatus, Plant, Department, Designation, Team, Shift, CostCenter
 
 # ===========================================================================
 # COMPANY SERVICES
@@ -245,3 +245,35 @@ def update_shift(shift: Shift, data: Dict[str, Any]) -> Shift:
 
 def delete_shift(shift: Shift) -> None:
     shift.delete()
+
+
+# ===========================================================================
+# COST CENTER SERVICES
+# ===========================================================================
+
+def get_all_cost_centers() -> List[CostCenter]:
+    return CostCenter.objects.all()
+
+def create_cost_center(data: Dict[str, Any]) -> CostCenter:
+    code = data.get('code')
+    if CostCenter.objects.filter(code__iexact=code).exists():
+        raise ValueError(f"Cost center with code '{code}' already exists.")
+    name = data.get('name')
+    if CostCenter.objects.filter(name__iexact=name).exists():
+        raise ValueError(f"Cost center with name '{name}' already exists.")
+    return CostCenter.objects.create(**data)
+
+def update_cost_center(cost_center: CostCenter, data: Dict[str, Any]) -> CostCenter:
+    code = data.get('code')
+    if code and CostCenter.objects.filter(code__iexact=code).exclude(id=cost_center.id).exists():
+        raise ValueError(f"Cost center with code '{code}' already exists.")
+    name = data.get('name')
+    if name and CostCenter.objects.filter(name__iexact=name).exclude(id=cost_center.id).exists():
+        raise ValueError(f"Cost center with name '{name}' already exists.")
+    for field, value in data.items():
+        setattr(cost_center, field, value)
+    cost_center.save()
+    return cost_center
+
+def delete_cost_center(cost_center: CostCenter) -> None:
+    cost_center.delete()

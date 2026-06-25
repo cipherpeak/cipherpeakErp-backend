@@ -448,6 +448,74 @@
               }
             }
           ]
+        },
+        {
+          "name": "Cost Centers",
+          "item": [
+            {
+              "name": "List Cost Centers",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/organization/cost-centers/"
+              }
+            },
+            {
+              "name": "Create Cost Center",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/organization/cost-centers/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"code\": \"CC001\",\n  \"name\": \"Engineering Dept\",\n  \"type\": \"cost\",\n  \"owner\": 1,\n  \"budget\": 500000.00,\n  \"spent\": 0.00,\n  \"status\": \"active\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Cost Center",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/organization/cost-centers/{{cost_center_id}}/"
+              }
+            },
+            {
+              "name": "Update Cost Center",
+              "request": {
+                "method": "PUT",
+                "url": "{{base_url}}/api/organization/cost-centers/{{cost_center_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"code\": \"CC001\",\n  \"name\": \"Engineering Dept Updated\",\n  \"type\": \"profit\",\n  \"owner\": 1,\n  \"budget\": 600000.00,\n  \"spent\": 0.00,\n  \"status\": \"active\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Patch Cost Center",
+              "request": {
+                "method": "PATCH",
+                "url": "{{base_url}}/api/organization/cost-centers/{{cost_center_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"status\": \"inactive\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Cost Center",
+              "request": {
+                "method": "DELETE",
+                "url": "{{base_url}}/api/organization/cost-centers/{{cost_center_id}}/"
+              }
+            }
+          ]
         }
       ]
     },

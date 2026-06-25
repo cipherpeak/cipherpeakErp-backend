@@ -11,6 +11,7 @@ router.register(r'departments', views.DepartmentViewSet, basename='department')
 router.register(r'designations', views.DesignationViewSet, basename='designation')
 router.register(r'teams', views.TeamViewSet, basename='team')
 router.register(r'shifts', views.ShiftViewSet, basename='shift')
+router.register(r'cost-centers', views.CostCenterViewSet, basename='cost-center')
 
 # The API URLs are now determined automatically by the router.
 urlpatterns = [

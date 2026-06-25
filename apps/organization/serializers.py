@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Company, Branch, Plant, Department, Designation, Team, Shift
+from .models import Company, Branch, Plant, Department, Designation, Team, Shift, CostCenter
 from apps.hr.models import Employee
 
 
@@ -55,4 +55,12 @@ class TeamSerializer(serializers.ModelSerializer):
 class ShiftSerializer(serializers.ModelSerializer):
     class Meta:
         model = Shift
+        fields = '__all__'
+
+
+class CostCenterSerializer(serializers.ModelSerializer):
+    owner_name = serializers.CharField(source='owner.name', read_only=True)
+
+    class Meta:
+        model = CostCenter
         fields = '__all__'
