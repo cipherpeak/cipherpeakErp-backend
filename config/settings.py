@@ -83,6 +83,15 @@ INSTALLED_APPS = [
     'apps.inventory',
     'apps.procurement',
     'apps.manufacturing',
+    'apps.quality',
+    'apps.finance',
+    'apps.crm',
+    'apps.sales',
+    'apps.talent',
+    'apps.payroll',
+    'apps.projects',
+    'apps.tax',
+    'apps.calendar_app',
 ]
 
 from datetime import timedelta
