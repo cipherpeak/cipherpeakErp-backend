@@ -1143,6 +1143,1782 @@
           ]
         }
       ]
+    },
+    {
+      "name": "INVENTORY",
+      "item": [
+        {
+          "name": "Item Categories",
+          "item": [
+            {
+              "name": "List Categories",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/inventory/categories/"
+              }
+            },
+            {
+              "name": "Create Category",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/inventory/categories/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Electronics\",\n  \"parent\": null,\n  \"level\": 1,\n  \"status\": \"active\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Category",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/inventory/categories/{{category_id}}/"
+              }
+            },
+            {
+              "name": "Get Category Children",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/inventory/categories/{{category_id}}/?type=children"
+              }
+            },
+            {
+              "name": "Update Category",
+              "request": {
+                "method": "PUT",
+                "url": "{{base_url}}/api/inventory/categories/{{category_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Electronics Updated\",\n  \"status\": \"active\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Category",
+              "request": {
+                "method": "DELETE",
+                "url": "{{base_url}}/api/inventory/categories/{{category_id}}/"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Units",
+          "item": [
+            {
+              "name": "List Units",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/inventory/units/"
+              }
+            },
+            {
+              "name": "Create Unit",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/inventory/units/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Kilogram\",\n  \"symbol\": \"kg\",\n  \"type\": \"weight\",\n  \"base_unit\": null,\n  \"conversion_factor\": 1.0000,\n  \"status\": \"active\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Unit",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/inventory/units/{{unit_id}}/"
+              }
+            },
+            {
+              "name": "Update Unit",
+              "request": {
+                "method": "PUT",
+                "url": "{{base_url}}/api/inventory/units/{{unit_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Kilogram\",\n  \"symbol\": \"kg\",\n  \"type\": \"weight\",\n  \"status\": \"active\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Unit",
+              "request": {
+                "method": "DELETE",
+                "url": "{{base_url}}/api/inventory/units/{{unit_id}}/"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Items",
+          "item": [
+            {
+              "name": "List Items",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/inventory/items/"
+              }
+            },
+            {
+              "name": "Create Item",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/inventory/items/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Laptop Dell XPS 15\",\n  \"sku\": \"LPT-DELL-XPS-001\",\n  \"barcode\": \"1234567890123\",\n  \"description\": \"Dell XPS 15 Laptop\",\n  \"category\": 1,\n  \"item_type\": \"finished_good\",\n  \"unit\": 1,\n  \"min_stock\": 10,\n  \"max_stock\": 100,\n  \"reorder_level\": 20,\n  \"current_stock\": 50,\n  \"cost_price\": 4500.00,\n  \"selling_price\": 5500.00,\n  \"tax_percentage\": 5.00,\n  \"batch_tracking\": false,\n  \"serial_tracking\": true,\n  \"status\": \"active\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Item",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/inventory/items/{{item_id}}/"
+              }
+            },
+            {
+              "name": "Update Item",
+              "request": {
+                "method": "PUT",
+                "url": "{{base_url}}/api/inventory/items/{{item_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Laptop Dell XPS 15 Updated\",\n  \"sku\": \"LPT-DELL-XPS-001\",\n  \"item_type\": \"finished_good\",\n  \"cost_price\": 4600.00,\n  \"selling_price\": 5600.00,\n  \"status\": \"active\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Item",
+              "request": {
+                "method": "DELETE",
+                "url": "{{base_url}}/api/inventory/items/{{item_id}}/"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Warehouses",
+          "item": [
+            {
+              "name": "List Warehouses",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/inventory/warehouses/"
+              }
+            },
+            {
+              "name": "Create Warehouse",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/inventory/warehouses/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Main Warehouse\",\n  \"code\": \"WH-001\",\n  \"address\": \"Industrial Area, Dubai\",\n  \"manager\": \"Ahmed Ali\",\n  \"capacity_sqm\": 5000.00,\n  \"used_sqm\": 2000.00,\n  \"status\": \"active\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Warehouse",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/inventory/warehouses/{{warehouse_id}}/"
+              }
+            },
+            {
+              "name": "Update Warehouse",
+              "request": {
+                "method": "PUT",
+                "url": "{{base_url}}/api/inventory/warehouses/{{warehouse_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Main Warehouse Updated\",\n  \"code\": \"WH-001\",\n  \"manager\": \"Sara Khan\",\n  \"status\": \"active\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Warehouse",
+              "request": {
+                "method": "DELETE",
+                "url": "{{base_url}}/api/inventory/warehouses/{{warehouse_id}}/"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Bins",
+          "item": [
+            {
+              "name": "List Bins",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/inventory/bins/"
+              }
+            },
+            {
+              "name": "List Bins by Warehouse",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/inventory/bins/?warehouse_id=1"
+              }
+            },
+            {
+              "name": "Create Bin",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/inventory/bins/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"warehouse\": 1,\n  \"zone\": \"A\",\n  \"row\": \"01\",\n  \"rack\": \"01\",\n  \"shelf\": \"01\",\n  \"position\": \"01\",\n  \"code\": \"WH001-A-01-01-01-01\",\n  \"status\": \"active\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Bin",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/inventory/bins/{{bin_id}}/"
+              }
+            },
+            {
+              "name": "Update Bin",
+              "request": {
+                "method": "PUT",
+                "url": "{{base_url}}/api/inventory/bins/{{bin_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"warehouse\": 1,\n  \"zone\": \"B\",\n  \"row\": \"02\",\n  \"rack\": \"01\",\n  \"shelf\": \"01\",\n  \"position\": \"01\",\n  \"code\": \"WH001-B-02-01-01-01\",\n  \"status\": \"active\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Bin",
+              "request": {
+                "method": "DELETE",
+                "url": "{{base_url}}/api/inventory/bins/{{bin_id}}/"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Stocks",
+          "item": [
+            {
+              "name": "List Stocks",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/inventory/stocks/"
+              }
+            },
+            {
+              "name": "List Stocks by Warehouse",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/inventory/stocks/?warehouse_id=1"
+              }
+            },
+            {
+              "name": "Create Stock",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/inventory/stocks/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"item\": 1,\n  \"warehouse\": 1,\n  \"bin\": 1,\n  \"quantity\": 50.00,\n  \"reserved_qty\": 5.00\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Stock",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/inventory/stocks/{{stock_id}}/"
+              }
+            },
+            {
+              "name": "Update Stock",
+              "request": {
+                "method": "PUT",
+                "url": "{{base_url}}/api/inventory/stocks/{{stock_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"item\": 1,\n  \"warehouse\": 1,\n  \"quantity\": 60.00,\n  \"reserved_qty\": 5.00\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Stock",
+              "request": {
+                "method": "DELETE",
+                "url": "{{base_url}}/api/inventory/stocks/{{stock_id}}/"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Stock Adjustments",
+          "item": [
+            {
+              "name": "List Adjustments",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/inventory/adjustments/"
+              }
+            },
+            {
+              "name": "Create Adjustment",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/inventory/adjustments/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"adjustment_number\": \"ADJ-001\",\n  \"item\": 1,\n  \"warehouse\": 1,\n  \"adjustment_type\": \"addition\",\n  \"quantity\": 10.00,\n  \"reason\": \"Stock count correction\",\n  \"remarks\": \"Additional items found\",\n  \"status\": \"pending\",\n  \"created_by\": \"Admin\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Adjustment",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/inventory/adjustments/{{adjustment_id}}/"
+              }
+            },
+            {
+              "name": "Update Adjustment",
+              "request": {
+                "method": "PUT",
+                "url": "{{base_url}}/api/inventory/adjustments/{{adjustment_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"adjustment_number\": \"ADJ-001\",\n  \"item\": 1,\n  \"warehouse\": 1,\n  \"adjustment_type\": \"addition\",\n  \"quantity\": 15.00,\n  \"status\": \"approved\",\n  \"approved_by\": \"Manager\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Adjustment",
+              "request": {
+                "method": "DELETE",
+                "url": "{{base_url}}/api/inventory/adjustments/{{adjustment_id}}/"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Stock Transfers",
+          "item": [
+            {
+              "name": "List Transfers",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/inventory/transfers/"
+              }
+            },
+            {
+              "name": "Create Transfer",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/inventory/transfers/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"transfer_number\": \"TRF-001\",\n  \"from_warehouse\": 1,\n  \"to_warehouse\": 2,\n  \"status\": \"draft\",\n  \"remarks\": \"Transfer to branch warehouse\",\n  \"created_by\": \"Admin\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Transfer",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/inventory/transfers/{{transfer_id}}/"
+              }
+            },
+            {
+              "name": "Update Transfer",
+              "request": {
+                "method": "PUT",
+                "url": "{{base_url}}/api/inventory/transfers/{{transfer_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"transfer_number\": \"TRF-001\",\n  \"from_warehouse\": 1,\n  \"to_warehouse\": 2,\n  \"status\": \"dispatched\",\n  \"dispatched_at\": \"2024-06-25T10:00:00Z\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Transfer",
+              "request": {
+                "method": "DELETE",
+                "url": "{{base_url}}/api/inventory/transfers/{{transfer_id}}/"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cycle Counts",
+          "item": [
+            {
+              "name": "List Cycle Counts",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/inventory/cycle-counts/"
+              }
+            },
+            {
+              "name": "Create Cycle Count",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/inventory/cycle-counts/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"cycle_count_number\": \"CC-001\",\n  \"warehouse\": 1,\n  \"status\": \"draft\",\n  \"total_items\": 100,\n  \"created_by\": \"Admin\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Cycle Count",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/inventory/cycle-counts/{{cycle_count_id}}/"
+              }
+            },
+            {
+              "name": "Update Cycle Count",
+              "request": {
+                "method": "PUT",
+                "url": "{{base_url}}/api/inventory/cycle-counts/{{cycle_count_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"cycle_count_number\": \"CC-001\",\n  \"warehouse\": 1,\n  \"status\": \"completed\",\n  \"counted_items\": 100,\n  \"discrepancies\": 5\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Cycle Count",
+              "request": {
+                "method": "DELETE",
+                "url": "{{base_url}}/api/inventory/cycle-counts/{{cycle_count_id}}/"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Ledger Entries",
+          "item": [
+            {
+              "name": "List Ledger Entries",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/inventory/ledger-entries/"
+              }
+            },
+            {
+              "name": "Get Ledger Entry",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/inventory/ledger-entries/{{ledger_entry_id}}/"
+              }
+            },
+            {
+              "name": "Create Ledger Entry",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/inventory/ledger-entries/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"item\": 1,\n  \"warehouse\": 1,\n  \"description\": \"Purchase receipt\",\n  \"debit_qty\": 50.00,\n  \"credit_qty\": 0,\n  \"balance_qty\": 50.00,\n  \"reference\": \"PO-001\",\n  \"type\": \"purchase\"\n}"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Stock Entries",
+          "item": [
+            {
+              "name": "List Stock Entries",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/inventory/stock-entries/"
+              }
+            },
+            {
+              "name": "Get Stock Entry",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/inventory/stock-entries/{{stock_entry_id}}/"
+              }
+            },
+            {
+              "name": "Create Stock Entry",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/inventory/stock-entries/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"item\": 1,\n  \"warehouse\": 1,\n  \"transaction_type\": \"purchase\",\n  \"quantity\": 50.00,\n  \"unit_cost\": 4500.00,\n  \"total_cost\": 225000.00,\n  \"reference_number\": \"PO-001\"\n}"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Batch Records",
+          "item": [
+            {
+              "name": "List Batch Records",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/inventory/batch-records/"
+              }
+            },
+            {
+              "name": "Create Batch Record",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/inventory/batch-records/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"item\": 1,\n  \"batch_number\": \"BATCH-001\",\n  \"manufacturing_date\": \"2024-01-15\",\n  \"expiry_date\": \"2025-01-15\",\n  \"quantity\": 100.00,\n  \"status\": \"active\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Batch Record",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/inventory/batch-records/{{batch_id}}/"
+              }
+            },
+            {
+              "name": "Update Batch Record",
+              "request": {
+                "method": "PUT",
+                "url": "{{base_url}}/api/inventory/batch-records/{{batch_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"item\": 1,\n  \"batch_number\": \"BATCH-001\",\n  \"quantity\": 80.00,\n  \"status\": \"active\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Batch Record",
+              "request": {
+                "method": "DELETE",
+                "url": "{{base_url}}/api/inventory/batch-records/{{batch_id}}/"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Serial Records",
+          "item": [
+            {
+              "name": "List Serial Records",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/inventory/serial-records/"
+              }
+            },
+            {
+              "name": "Create Serial Record",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/inventory/serial-records/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"item\": 1,\n  \"serial_number\": \"SN-001-001\",\n  \"status\": \"available\",\n  \"warehouse\": 1\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Serial Record",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/inventory/serial-records/{{serial_id}}/"
+              }
+            },
+            {
+              "name": "Update Serial Record",
+              "request": {
+                "method": "PUT",
+                "url": "{{base_url}}/api/inventory/serial-records/{{serial_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"item\": 1,\n  \"serial_number\": \"SN-001-001\",\n  \"status\": \"in_stock\",\n  \"warehouse\": 1\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Serial Record",
+              "request": {
+                "method": "DELETE",
+                "url": "{{base_url}}/api/inventory/serial-records/{{serial_id}}/"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "PROCUREMENT",
+      "item": [
+        {
+          "name": "Vendor Categories",
+          "item": [
+            {
+              "name": "List Vendor Categories",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/procurement/vendor-categories/"
+              }
+            },
+            {
+              "name": "Create Vendor Category",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/procurement/vendor-categories/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Electronics Supplier\",\n  \"description\": \"Suppliers for electronic components\",\n  \"vendor_count\": 0,\n  \"status\": \"active\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Vendor Category",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/procurement/vendor-categories/{{vendor_category_id}}/"
+              }
+            },
+            {
+              "name": "Update Vendor Category",
+              "request": {
+                "method": "PUT",
+                "url": "{{base_url}}/api/procurement/vendor-categories/{{vendor_category_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Electronics Supplier Updated\",\n  \"status\": \"active\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Vendor Category",
+              "request": {
+                "method": "DELETE",
+                "url": "{{base_url}}/api/procurement/vendor-categories/{{vendor_category_id}}/"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Payment Terms",
+          "item": [
+            {
+              "name": "List Payment Terms",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/procurement/payment-terms/"
+              }
+            },
+            {
+              "name": "Create Payment Term",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/procurement/payment-terms/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Net 30\",\n  \"days\": 30,\n  \"description\": \"Payment due within 30 days\",\n  \"status\": \"active\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Payment Term",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/procurement/payment-terms/{{payment_term_id}}/"
+              }
+            },
+            {
+              "name": "Update Payment Term",
+              "request": {
+                "method": "PUT",
+                "url": "{{base_url}}/api/procurement/payment-terms/{{payment_term_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Net 30 Updated\",\n  \"days\": 30,\n  \"status\": \"active\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Payment Term",
+              "request": {
+                "method": "DELETE",
+                "url": "{{base_url}}/api/procurement/payment-terms/{{payment_term_id}}/"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Vendors",
+          "item": [
+            {
+              "name": "List Vendors",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/procurement/vendors/"
+              }
+            },
+            {
+              "name": "Create Vendor",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/procurement/vendors/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"code\": \"VND-001\",\n  \"name\": \"Tech Supplies Co.\",\n  \"gstin\": \"GSTIN123456\",\n  \"pan\": \"PAN123456\",\n  \"trn\": \"TRN123456\",\n  \"address\": \"123 Business Park\",\n  \"city\": \"Dubai\",\n  \"state\": \"Dubai\",\n  \"country\": \"UAE\",\n  \"phone\": \"+971501234567\",\n  \"email\": \"contact@techsupplies.com\",\n  \"category\": 1,\n  \"payment_terms\": 1,\n  \"credit_limit\": 50000.00,\n  \"rating\": 4,\n  \"is_preferred\": true,\n  \"status\": \"active\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Vendor",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/procurement/vendors/{{vendor_id}}/"
+              }
+            },
+            {
+              "name": "Update Vendor",
+              "request": {
+                "method": "PUT",
+                "url": "{{base_url}}/api/procurement/vendors/{{vendor_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"code\": \"VND-001\",\n  \"name\": \"Tech Supplies Co. Updated\",\n  \"credit_limit\": 60000.00,\n  \"rating\": 5,\n  \"status\": \"active\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Vendor",
+              "request": {
+                "method": "DELETE",
+                "url": "{{base_url}}/api/procurement/vendors/{{vendor_id}}/"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Purchase Requests",
+          "item": [
+            {
+              "name": "List Purchase Requests",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/procurement/purchase-requests/"
+              }
+            },
+            {
+              "name": "Create Purchase Request",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/procurement/purchase-requests/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"pr_number\": \"PR-001\",\n  \"department\": \"Engineering\",\n  \"requested_by\": \"John Smith\",\n  \"date\": \"2024-06-25\",\n  \"priority\": \"high\",\n  \"status\": \"draft\",\n  \"total_estimated_cost\": 15000.00\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Purchase Request",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/procurement/purchase-requests/{{pr_id}}/"
+              }
+            },
+            {
+              "name": "Update Purchase Request",
+              "request": {
+                "method": "PUT",
+                "url": "{{base_url}}/api/procurement/purchase-requests/{{pr_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"pr_number\": \"PR-001\",\n  \"department\": \"Engineering\",\n  \"status\": \"submitted\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Purchase Request",
+              "request": {
+                "method": "DELETE",
+                "url": "{{base_url}}/api/procurement/purchase-requests/{{pr_id}}/"
+              }
+            }
+          ]
+        },
+        {
+          "name": "RFQs",
+          "item": [
+            {
+              "name": "List RFQs",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/procurement/rfqs/"
+              }
+            },
+            {
+              "name": "Create RFQ",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/procurement/rfqs/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"rfq_number\": \"RFQ-001\",\n  \"pr\": 1,\n  \"date\": \"2024-06-25\",\n  \"due_date\": \"2024-07-01\",\n  \"status\": \"draft\",\n  \"created_by\": \"Admin\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get RFQ",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/procurement/rfqs/{{rfq_id}}/"
+              }
+            },
+            {
+              "name": "Update RFQ",
+              "request": {
+                "method": "PUT",
+                "url": "{{base_url}}/api/procurement/rfqs/{{rfq_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"rfq_number\": \"RFQ-001\",\n  \"status\": \"sent\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete RFQ",
+              "request": {
+                "method": "DELETE",
+                "url": "{{base_url}}/api/procurement/rfqs/{{rfq_id}}/"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Quotations",
+          "item": [
+            {
+              "name": "List Quotations",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/procurement/quotations/"
+              }
+            },
+            {
+              "name": "Create Quotation",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/procurement/quotations/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"quotation_number\": \"QUO-001\",\n  \"rfq\": 1,\n  \"vendor\": 1,\n  \"date\": \"2024-06-25\",\n  \"valid_until\": \"2024-07-25\",\n  \"subtotal\": 10000.00,\n  \"discount_amount\": 500.00,\n  \"tax_amount\": 950.00,\n  \"total_amount\": 10450.00,\n  \"payment_terms\": \"Net 30\",\n  \"status\": \"draft\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Quotation",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/procurement/quotations/{{quotation_id}}/"
+              }
+            },
+            {
+              "name": "Update Quotation",
+              "request": {
+                "method": "PUT",
+                "url": "{{base_url}}/api/procurement/quotations/{{quotation_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"quotation_number\": \"QUO-001\",\n  \"status\": \"accepted\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Quotation",
+              "request": {
+                "method": "DELETE",
+                "url": "{{base_url}}/api/procurement/quotations/{{quotation_id}}/"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Purchase Orders",
+          "item": [
+            {
+              "name": "List Purchase Orders",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/procurement/purchase-orders/"
+              }
+            },
+            {
+              "name": "Create Purchase Order",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/procurement/purchase-orders/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"po_number\": \"PO-001\",\n  \"vendor\": 1,\n  \"subtotal\": 10000.00,\n  \"discount_amount\": 500.00,\n  \"tax_amount\": 950.00,\n  \"total_amount\": 10450.00,\n  \"delivery_date\": \"2024-07-15\",\n  \"delivery_address\": \"Dubai Main Branch\",\n  \"payment_terms\": \"Net 30\",\n  \"status\": \"draft\",\n  \"created_by\": \"Admin\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Purchase Order",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/procurement/purchase-orders/{{po_id}}/"
+              }
+            },
+            {
+              "name": "Update Purchase Order",
+              "request": {
+                "method": "PUT",
+                "url": "{{base_url}}/api/procurement/purchase-orders/{{po_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"po_number\": \"PO-001\",\n  \"status\": \"approved\",\n  \"approved_by\": \"Manager\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Purchase Order",
+              "request": {
+                "method": "DELETE",
+                "url": "{{base_url}}/api/procurement/purchase-orders/{{po_id}}/"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GRNs",
+          "item": [
+            {
+              "name": "List GRNs",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/procurement/grns/"
+              }
+            },
+            {
+              "name": "Create GRN",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/procurement/grns/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"grn_number\": \"GRN-001\",\n  \"po\": 1,\n  \"vendor\": 1,\n  \"warehouse\": 1,\n  \"total_received_value\": 10450.00,\n  \"status\": \"draft\",\n  \"received_by\": \"Store Manager\",\n  \"vehicle_number\": \"DXB-1234\",\n  \"lr_number\": \"LR-001\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get GRN",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/procurement/grns/{{grn_id}}/"
+              }
+            },
+            {
+              "name": "Update GRN",
+              "request": {
+                "method": "PUT",
+                "url": "{{base_url}}/api/procurement/grns/{{grn_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"grn_number\": \"GRN-001\",\n  \"status\": \"verified\",\n  \"verified_by\": \"QA Manager\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete GRN",
+              "request": {
+                "method": "DELETE",
+                "url": "{{base_url}}/api/procurement/grns/{{grn_id}}/"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Purchase Invoices",
+          "item": [
+            {
+              "name": "List Purchase Invoices",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/procurement/purchase-invoices/"
+              }
+            },
+            {
+              "name": "Create Purchase Invoice",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/procurement/purchase-invoices/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"invoice_number\": \"INV-001\",\n  \"po\": 1,\n  \"vendor\": 1,\n  \"invoice_date\": \"2024-06-25\",\n  \"due_date\": \"2024-07-25\",\n  \"subtotal\": 10000.00,\n  \"tax_amount\": 950.00,\n  \"total_amount\": 10950.00,\n  \"status\": \"draft\",\n  \"created_by\": \"Admin\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Purchase Invoice",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/procurement/purchase-invoices/{{invoice_id}}/"
+              }
+            },
+            {
+              "name": "Update Purchase Invoice",
+              "request": {
+                "method": "PUT",
+                "url": "{{base_url}}/api/procurement/purchase-invoices/{{invoice_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"invoice_number\": \"INV-001\",\n  \"status\": \"validated\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Purchase Invoice",
+              "request": {
+                "method": "DELETE",
+                "url": "{{base_url}}/api/procurement/purchase-invoices/{{invoice_id}}/"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Vendor Payments",
+          "item": [
+            {
+              "name": "List Vendor Payments",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/procurement/vendor-payments/"
+              }
+            },
+            {
+              "name": "Create Vendor Payment",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/procurement/vendor-payments/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"payment_number\": \"PAY-001\",\n  \"invoice\": 1,\n  \"vendor\": 1,\n  \"amount\": 10950.00,\n  \"payment_date\": \"2024-06-25\",\n  \"payment_method\": \"bank_transfer\",\n  \"reference\": \"TXN-001\",\n  \"bank_account\": \"1234567890\",\n  \"status\": \"pending\",\n  \"created_by\": \"Admin\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Vendor Payment",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/procurement/vendor-payments/{{payment_id}}/"
+              }
+            },
+            {
+              "name": "Update Vendor Payment",
+              "request": {
+                "method": "PUT",
+                "url": "{{base_url}}/api/procurement/vendor-payments/{{payment_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"payment_number\": \"PAY-001\",\n  \"status\": \"completed\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Vendor Payment",
+              "request": {
+                "method": "DELETE",
+                "url": "{{base_url}}/api/procurement/vendor-payments/{{payment_id}}/"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "MANUFACTURING",
+      "item": [
+        {
+          "name": "Machine Categories",
+          "item": [
+            {
+              "name": "List Machine Categories",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/manufacturing/machine-categories/"
+              }
+            },
+            {
+              "name": "Create Machine Category",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/manufacturing/machine-categories/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"CNC Machines\",\n  \"description\": \"Computer Numerical Control machines\",\n  \"status\": \"active\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Machine Category",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/manufacturing/machine-categories/{{machine_category_id}}/"
+              }
+            },
+            {
+              "name": "Update Machine Category",
+              "request": {
+                "method": "PUT",
+                "url": "{{base_url}}/api/manufacturing/machine-categories/{{machine_category_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"CNC Machines Updated\",\n  \"status\": \"active\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Machine Category",
+              "request": {
+                "method": "DELETE",
+                "url": "{{base_url}}/api/manufacturing/machine-categories/{{machine_category_id}}/"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Machines",
+          "item": [
+            {
+              "name": "List Machines",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/manufacturing/machines/"
+              }
+            },
+            {
+              "name": "Create Machine",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/manufacturing/machines/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"code\": \"MCH-001\",\n  \"name\": \"CNC Lathe 1\",\n  \"category\": 1,\n  \"plant\": 1,\n  \"status\": \"operational\",\n  \"capacity_per_hour\": 50.00,\n  \"efficiency_pct\": 85.50,\n  \"manufacturer\": \"Haas\",\n  \"model\": \"VF-2\",\n  \"serial_number\": \"SN-12345\",\n  \"year_installed\": 2020,\n  \"last_maintenance\": \"2024-06-01\",\n  \"next_maintenance\": \"2024-09-01\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Machine",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/manufacturing/machines/{{machine_id}}/"
+              }
+            },
+            {
+              "name": "Update Machine",
+              "request": {
+                "method": "PUT",
+                "url": "{{base_url}}/api/manufacturing/machines/{{machine_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"code\": \"MCH-001\",\n  \"name\": \"CNC Lathe 1 Updated\",\n  \"status\": \"maintenance\",\n  \"efficiency_pct\": 90.00\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Machine",
+              "request": {
+                "method": "DELETE",
+                "url": "{{base_url}}/api/manufacturing/machines/{{machine_id}}/"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Production Lines",
+          "item": [
+            {
+              "name": "List Production Lines",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/manufacturing/production-lines/"
+              }
+            },
+            {
+              "name": "Create Production Line",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/manufacturing/production-lines/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"code\": \"PL-001\",\n  \"name\": \"Assembly Line 1\",\n  \"plant\": 1,\n  \"capacity_per_hour\": 100.00,\n  \"status\": \"active\",\n  \"efficiency_pct\": 88.50,\n  \"supervisor\": \"Ali Hassan\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Production Line",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/manufacturing/production-lines/{{production_line_id}}/"
+              }
+            },
+            {
+              "name": "Update Production Line",
+              "request": {
+                "method": "PUT",
+                "url": "{{base_url}}/api/manufacturing/production-lines/{{production_line_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"code\": \"PL-001\",\n  \"name\": \"Assembly Line 1 Updated\",\n  \"status\": \"active\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Production Line",
+              "request": {
+                "method": "DELETE",
+                "url": "{{base_url}}/api/manufacturing/production-lines/{{production_line_id}}/"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Work Centers",
+          "item": [
+            {
+              "name": "List Work Centers",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/manufacturing/work-centers/"
+              }
+            },
+            {
+              "name": "Create Work Center",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/manufacturing/work-centers/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"code\": \"WC-001\",\n  \"name\": \"Machining Center\",\n  \"plant\": 1,\n  \"department\": \"Production\",\n  \"capacity\": 500.00,\n  \"cost_per_hour\": 75.00,\n  \"status\": \"active\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Work Center",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/manufacturing/work-centers/{{work_center_id}}/"
+              }
+            },
+            {
+              "name": "Update Work Center",
+              "request": {
+                "method": "PUT",
+                "url": "{{base_url}}/api/manufacturing/work-centers/{{work_center_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"code\": \"WC-001\",\n  \"name\": \"Machining Center Updated\",\n  \"cost_per_hour\": 80.00,\n  \"status\": \"active\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Work Center",
+              "request": {
+                "method": "DELETE",
+                "url": "{{base_url}}/api/manufacturing/work-centers/{{work_center_id}}/"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Products",
+          "item": [
+            {
+              "name": "List Products",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/manufacturing/products/"
+              }
+            },
+            {
+              "name": "Create Product",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/manufacturing/products/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"code\": \"PRD-001\",\n  \"name\": \"Steel Gear Assembly\",\n  \"category\": \"Mechanical\",\n  \"unit\": \"piece\",\n  \"status\": \"active\",\n  \"cost_price\": 150.00,\n  \"selling_price\": 250.00\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Product",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/manufacturing/products/{{product_id}}/"
+              }
+            },
+            {
+              "name": "Update Product",
+              "request": {
+                "method": "PUT",
+                "url": "{{base_url}}/api/manufacturing/products/{{product_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"code\": \"PRD-001\",\n  \"name\": \"Steel Gear Assembly Updated\",\n  \"cost_price\": 160.00,\n  \"selling_price\": 260.00,\n  \"status\": \"active\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Product",
+              "request": {
+                "method": "DELETE",
+                "url": "{{base_url}}/api/manufacturing/products/{{product_id}}/"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Bills of Materials",
+          "item": [
+            {
+              "name": "List BOMs",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/manufacturing/boms/"
+              }
+            },
+            {
+              "name": "Create BOM",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/manufacturing/boms/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"code\": \"BOM-001\",\n  \"product\": 1,\n  \"version\": \"1.0\",\n  \"status\": \"draft\",\n  \"description\": \"BOM for Steel Gear Assembly\",\n  \"unit\": \"piece\",\n  \"quantity\": 1.00,\n  \"total_material_cost\": 120.00,\n  \"total_operation_cost\": 30.00,\n  \"total_cost\": 150.00,\n  \"created_by\": \"Admin\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get BOM",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/manufacturing/boms/{{bom_id}}/"
+              }
+            },
+            {
+              "name": "Update BOM",
+              "request": {
+                "method": "PUT",
+                "url": "{{base_url}}/api/manufacturing/boms/{{bom_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"code\": \"BOM-001\",\n  \"product\": 1,\n  \"version\": \"1.1\",\n  \"status\": \"active\",\n  \"total_material_cost\": 125.00,\n  \"total_cost\": 155.00\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete BOM",
+              "request": {
+                "method": "DELETE",
+                "url": "{{base_url}}/api/manufacturing/boms/{{bom_id}}/"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Production Plans",
+          "item": [
+            {
+              "name": "List Production Plans",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/manufacturing/production-plans/"
+              }
+            },
+            {
+              "name": "Create Production Plan",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/manufacturing/production-plans/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"plan_number\": \"PP-001\",\n  \"product\": 1,\n  \"quantity\": 500.00,\n  \"priority\": \"high\",\n  \"start_date\": \"2024-07-01\",\n  \"end_date\": \"2024-07-15\",\n  \"production_line\": \"Assembly Line 1\",\n  \"status\": \"draft\",\n  \"created_by\": \"Admin\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Production Plan",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/manufacturing/production-plans/{{plan_id}}/"
+              }
+            },
+            {
+              "name": "Update Production Plan",
+              "request": {
+                "method": "PUT",
+                "url": "{{base_url}}/api/manufacturing/production-plans/{{plan_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"plan_number\": \"PP-001\",\n  \"product\": 1,\n  \"status\": \"planned\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Production Plan",
+              "request": {
+                "method": "DELETE",
+                "url": "{{base_url}}/api/manufacturing/production-plans/{{plan_id}}/"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Work Orders",
+          "item": [
+            {
+              "name": "List Work Orders",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/manufacturing/work-orders/"
+              }
+            },
+            {
+              "name": "Create Work Order",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/manufacturing/work-orders/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"wo_number\": \"WO-001\",\n  \"plan\": 1,\n  \"product\": 1,\n  \"quantity\": 100.00,\n  \"priority\": \"high\",\n  \"status\": \"draft\",\n  \"production_line\": \"Assembly Line 1\",\n  \"created_by\": \"Admin\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Work Order",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/manufacturing/work-orders/{{wo_id}}/"
+              }
+            },
+            {
+              "name": "Update Work Order",
+              "request": {
+                "method": "PUT",
+                "url": "{{base_url}}/api/manufacturing/work-orders/{{wo_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"wo_number\": \"WO-001\",\n  \"product\": 1,\n  \"status\": \"in_progress\",\n  \"progress_pct\": 25.00\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Work Order",
+              "request": {
+                "method": "DELETE",
+                "url": "{{base_url}}/api/manufacturing/work-orders/{{wo_id}}/"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Job Cards",
+          "item": [
+            {
+              "name": "List Job Cards",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/manufacturing/job-cards/"
+              }
+            },
+            {
+              "name": "Create Job Card",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/manufacturing/job-cards/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"wo\": 1,\n  \"machine\": 1,\n  \"operator\": \"Ahmed Ali\",\n  \"status\": \"pending\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Job Card",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/manufacturing/job-cards/{{job_card_id}}/"
+              }
+            },
+            {
+              "name": "Update Job Card",
+              "request": {
+                "method": "PUT",
+                "url": "{{base_url}}/api/manufacturing/job-cards/{{job_card_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"wo\": 1,\n  \"machine\": 1,\n  \"operator\": \"Ahmed Ali\",\n  \"status\": \"in_progress\",\n  \"produced_qty\": 25.00\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Job Card",
+              "request": {
+                "method": "DELETE",
+                "url": "{{base_url}}/api/manufacturing/job-cards/{{job_card_id}}/"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Production Tracking",
+          "item": [
+            {
+              "name": "List Production Tracking",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/manufacturing/production-tracking/"
+              }
+            },
+            {
+              "name": "Create Production Tracking",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/manufacturing/production-tracking/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"wo\": 1,\n  \"shift\": \"Morning\",\n  \"status\": \"on_track\",\n  \"produced_qty\": 50.00,\n  \"target_qty\": 100.00,\n  \"downtime_min\": 15\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Production Tracking",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/manufacturing/production-tracking/{{tracking_id}}/"
+              }
+            },
+            {
+              "name": "Update Production Tracking",
+              "request": {
+                "method": "PUT",
+                "url": "{{base_url}}/api/manufacturing/production-tracking/{{tracking_id}}/",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"wo\": 1,\n  \"shift\": \"Morning\",\n  \"status\": \"completed\",\n  \"produced_qty\": 100.00,\n  \"target_qty\": 100.00\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Production Tracking",
+              "request": {
+                "method": "DELETE",
+                "url": "{{base_url}}/api/manufacturing/production-tracking/{{tracking_id}}/"
+              }
+            }
+          ]
+        }
+      ]
     }
   ]
 }
