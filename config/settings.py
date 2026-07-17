@@ -92,6 +92,7 @@ INSTALLED_APPS = [
     'apps.projects',
     'apps.tax',
     'apps.calendar_app',
+    'apps.ai',
 ]
 
 from datetime import timedelta
