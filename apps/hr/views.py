@@ -34,10 +34,20 @@ class EmployeeLoginView(APIView):
         try:
             employee = Employee.objects.get(emp_id=emp_id)
         except Employee.DoesNotExist:
-            return Response(
-                {'error': 'Invalid emp_id or password'},
-                status=status.HTTP_401_UNAUTHORIZED,
-            )
+            try:
+                employee = Employee.objects.get(emp_id__iexact=emp_id)
+            except Employee.DoesNotExist:
+                cleaned_id = emp_id.replace('-', '').replace(' ', '').lower()
+                employee = None
+                for emp in Employee.objects.all():
+                    if emp.emp_id.replace('-', '').replace(' ', '').lower() == cleaned_id:
+                        employee = emp
+                        break
+                if not employee:
+                    return Response(
+                        {'error': 'Invalid emp_id or password'},
+                        status=status.HTTP_401_UNAUTHORIZED,
+                    )
 
         if not employee.check_password(password):
             return Response(
@@ -57,16 +67,8 @@ class EmployeeLoginView(APIView):
             'access': str(refresh.access_token),
             'refresh': str(refresh),
             'employee': {
-                'id': employee.id,
-                'emp_id': employee.emp_id,
                 'name': employee.name,
                 'email': employee.email,
-                'department': employee.department.id if employee.department else None,
-                'department_name': employee.department.name if employee.department else None,
-                'designation': employee.designation,
-                'branch': employee.branch.id if employee.branch else None,
-                'branch_name': employee.branch.name if employee.branch else None,
-                'is_staff': employee.is_staff,
             }
         }, status=status.HTTP_200_OK)
 

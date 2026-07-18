@@ -78,7 +78,11 @@ class BranchViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
 
     def list(self, request):
-        branches = services.get_all_branches()
+        company_id = request.query_params.get('company')
+        if company_id:
+            branches = Branch.objects.filter(company_id=company_id)
+        else:
+            branches = services.get_all_branches()
         serializer = BranchSerializer(branches, many=True)
         return Response(serializer.data)
 
