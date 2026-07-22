@@ -3,7 +3,9 @@ from .models import Employee, AttendanceRecord, LeaveRequest, EmpDocument
 
 
 class EmployeeSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, required=True)
+    # Optional so that editing an employee does not force re-sending a password.
+    # Creation still supplies one from the "Add Employee" modal.
+    password = serializers.CharField(write_only=True, required=False, allow_blank=True)
     department_name = serializers.CharField(source='department.name', read_only=True, default=None)
     branch_name = serializers.CharField(source='branch.name', read_only=True, default=None)
 
@@ -12,9 +14,12 @@ class EmployeeSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def create(self, validated_data):
-        password = validated_data.pop('password')
+        password = validated_data.pop('password', None)
         employee = Employee(**validated_data)
-        employee.set_password(password)
+        if password:
+            employee.set_password(password)
+        else:
+            employee.set_unusable_password()
         employee.save()
         return employee
 

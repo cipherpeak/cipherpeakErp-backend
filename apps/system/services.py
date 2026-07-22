@@ -32,8 +32,10 @@ def get_all_system_users() -> List[SystemUser]:
     return SystemUser.objects.all()
 
 def create_system_user(data: Dict[str, Any]) -> SystemUser:
-    password = data.pop('password_hash')
+    password = data.pop('password_hash', None)
     user = SystemUser(**data)
+    if not password:
+        password = 'TempPassword123!'
     user.password_hash = make_password(password)
     user.save()
     return user

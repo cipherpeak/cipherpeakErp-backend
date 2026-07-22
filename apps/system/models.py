@@ -17,6 +17,7 @@ class CompanyStatus(models.TextChoices):
 
 
 class DelegationStatus(models.TextChoices):
+    UPCOMING = 'upcoming', 'Upcoming'
     ACTIVE = 'active', 'Active'
     EXPIRED = 'expired', 'Expired'
 
@@ -45,6 +46,11 @@ class Role(models.Model):
     permissions = models.JSONField(default=list, blank=True)
     user_count = models.IntegerField(default=0)
     is_system = models.BooleanField(default=False)
+    status = models.CharField(
+        max_length=20,
+        choices=CompanyStatus.choices,
+        default=CompanyStatus.ACTIVE,
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -65,6 +71,7 @@ class SystemUser(models.Model):
     """
     System user for admin/management access.
     """
+    user_id = models.CharField(max_length=100, unique=True, blank=True, null=True)
     name = models.CharField(max_length=255)
     email = models.EmailField(unique=True)
     password_hash = models.CharField(max_length=500)
@@ -84,7 +91,7 @@ class SystemUser(models.Model):
     )
     two_fa = models.BooleanField(default=False)
     avatar_initials = models.CharField(max_length=10, blank=True, null=True)
-    avatar_color = models.CharField(max_length=20, blank=True, null=True)
+    avatar_color = models.CharField(max_length=255, blank=True, null=True)
     last_login = models.DateTimeField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -150,6 +157,7 @@ class Delegation(models.Model):
     start_date = models.DateField()
     end_date = models.DateField()
     reason = models.TextField(blank=True, null=True)
+    scope = models.CharField(max_length=255, blank=True, null=True)
     status = models.CharField(
         max_length=20,
         choices=DelegationStatus.choices,

@@ -115,38 +115,183 @@ class ApprovalWorkflowViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
 
     def list(self, request):
-        workflows = services.get_all_workflows()
-        serializer = ApprovalWorkflowSerializer(workflows, many=True)
-        return Response(serializer.data)
+        from collections import defaultdict
+        from .models import ApprovalWorkflow
+        
+        all_records = ApprovalWorkflow.objects.all().order_by('module', 'step_order')
+        grouped = defaultdict(list)
+        for rec in all_records:
+            grouped[rec.module].append(rec)
+            
+        data = []
+        for module, recs in grouped.items():
+            first_rec = recs[0]
+            name = f"{module} Flow" if "Management" in module or "Permissions" in module else f"{module} Approval"
+            is_active = any(r.status == 'active' for r in recs)
+            
+            levels = []
+            for r in recs:
+                levels.append({
+                    "step": r.step_order,
+                    "approver_role": r.approver_role or "Manager",
+                    "label": f"{r.approver_role or 'Manager'} Approval"
+                })
+                
+            data.append({
+                "id": first_rec.id,
+                "name": name,
+                "module": module,
+                "description": f"Approval workflow steps for {module} module.",
+                "is_active": is_active,
+                "levels": levels
+            })
+        return Response(data)
 
     def retrieve(self, request, pk=None):
-        workflow = get_object_or_404(ApprovalWorkflow, pk=pk)
-        serializer = ApprovalWorkflowSerializer(workflow)
-        return Response(serializer.data)
+        from .models import ApprovalWorkflow
+        first_rec = get_object_or_404(ApprovalWorkflow, pk=pk)
+        module = first_rec.module
+        recs = ApprovalWorkflow.objects.filter(module=module).order_by('step_order')
+        
+        name = f"{module} Flow" if "Management" in module or "Permissions" in module else f"{module} Approval"
+        is_active = any(r.status == 'active' for r in recs)
+        
+        levels = []
+        for r in recs:
+            levels.append({
+                "step": r.step_order,
+                "approver_role": r.approver_role or "Manager",
+                "label": f"{r.approver_role or 'Manager'} Approval"
+            })
+            
+        data = {
+            "id": first_rec.id,
+            "name": name,
+            "module": module,
+            "description": f"Approval workflow steps for {module} module.",
+            "is_active": is_active,
+            "levels": levels
+        }
+        return Response(data)
 
     def create(self, request):
-        serializer = ApprovalWorkflowSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        workflow = services.create_workflow(serializer.validated_data)
-        return Response(ApprovalWorkflowSerializer(workflow).data, status=status.HTTP_201_CREATED)
+        from .models import ApprovalWorkflow
+        from django.db import transaction
+        
+        payload = request.data
+        module = payload.get("module")
+        levels = payload.get("levels", [])
+        is_active = payload.get("is_active", True)
+        
+        if not module:
+            return Response({"module": ["This field is required."]}, status=status.HTTP_400_BAD_REQUEST)
+            
+        with transaction.atomic():
+            # Delete any existing workflow steps for this module
+            ApprovalWorkflow.objects.filter(module=module).delete()
+            
+            created_recs = []
+            for lvl in levels:
+                rec = ApprovalWorkflow.objects.create(
+                    module=module,
+                    step_order=lvl.get("step", 1),
+                    approver_role=lvl.get("approver_role", "Manager"),
+                    status="active" if is_active else "inactive",
+                    threshold=None,
+                    auto_approve_under=None
+                )
+                created_recs.append(rec)
+                
+        if not created_recs:
+            return Response({"error": "No levels provided"}, status=status.HTTP_400_BAD_REQUEST)
+            
+        first_rec = created_recs[0]
+        name = f"{module} Flow" if "Management" in module or "Permissions" in module else f"{module} Approval"
+        return Response({
+            "id": first_rec.id,
+            "name": name,
+            "module": module,
+            "description": f"Approval workflow steps for {module} module.",
+            "is_active": is_active,
+            "levels": levels
+        }, status=status.HTTP_201_CREATED)
 
     def update(self, request, pk=None):
-        workflow = get_object_or_404(ApprovalWorkflow, pk=pk)
-        serializer = ApprovalWorkflowSerializer(workflow, data=request.data)
-        serializer.is_valid(raise_exception=True)
-        updated_workflow = services.update_workflow(workflow, serializer.validated_data)
-        return Response(ApprovalWorkflowSerializer(updated_workflow).data)
+        from .models import ApprovalWorkflow
+        from django.db import transaction
+        
+        target_rec = get_object_or_404(ApprovalWorkflow, pk=pk)
+        target_module = target_rec.module
+        
+        payload = request.data
+        
+        # If payload specifies is_active only (toggle active):
+        if "is_active" in payload and len(payload) == 1:
+            is_active = payload.get("is_active")
+            recs = ApprovalWorkflow.objects.filter(module=target_module)
+            for r in recs:
+                r.status = "active" if is_active else "inactive"
+                r.save()
+                
+            levels = [{
+                "step": r.step_order,
+                "approver_role": r.approver_role or "Manager",
+                "label": f"{r.approver_role or 'Manager'} Approval"
+            } for r in recs.order_by('step_order')]
+            
+            name = f"{target_module} Flow" if "Management" in target_module or "Permissions" in target_module else f"{target_module} Approval"
+            return Response({
+                "id": target_rec.id,
+                "name": name,
+                "module": target_module,
+                "description": f"Approval workflow steps for {target_module} module.",
+                "is_active": is_active,
+                "levels": levels
+            })
+            
+        module = payload.get("module", target_module)
+        levels = payload.get("levels", [])
+        is_active = payload.get("is_active", True)
+        
+        with transaction.atomic():
+            # Delete old records for the target module (and the new one if renamed)
+            ApprovalWorkflow.objects.filter(module=target_module).delete()
+            if module != target_module:
+                ApprovalWorkflow.objects.filter(module=module).delete()
+                
+            created_recs = []
+            for lvl in levels:
+                rec = ApprovalWorkflow.objects.create(
+                    module=module,
+                    step_order=lvl.get("step", 1),
+                    approver_role=lvl.get("approver_role", "Manager"),
+                    status="active" if is_active else "inactive",
+                    threshold=None,
+                    auto_approve_under=None
+                )
+                created_recs.append(rec)
+                
+        if not created_recs:
+            return Response({"error": "No levels provided"}, status=status.HTTP_400_BAD_REQUEST)
+            
+        first_rec = created_recs[0]
+        name = f"{module} Flow" if "Management" in module or "Permissions" in module else f"{module} Approval"
+        return Response({
+            "id": first_rec.id,
+            "name": name,
+            "module": module,
+            "description": f"Approval workflow steps for {module} module.",
+            "is_active": is_active,
+            "levels": levels
+        })
 
     def partial_update(self, request, pk=None):
-        workflow = get_object_or_404(ApprovalWorkflow, pk=pk)
-        serializer = ApprovalWorkflowSerializer(workflow, data=request.data, partial=True)
-        serializer.is_valid(raise_exception=True)
-        updated_workflow = services.update_workflow(workflow, serializer.validated_data)
-        return Response(ApprovalWorkflowSerializer(updated_workflow).data)
+        return self.update(request, pk)
 
     def destroy(self, request, pk=None):
+        from .models import ApprovalWorkflow
         workflow = get_object_or_404(ApprovalWorkflow, pk=pk)
-        services.delete_workflow(workflow)
+        ApprovalWorkflow.objects.filter(module=workflow.module).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -173,21 +318,25 @@ class DelegationViewSet(viewsets.ViewSet):
     def create(self, request):
         serializer = DelegationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        delegation = services.create_delegation(serializer.validated_data)
+        # Use serializer.save() so the serializer's create() resolves the
+        # delegator/delegate names into from_user/to_user. Calling the service
+        # directly with validated_data would omit those FKs and raise a
+        # NOT NULL IntegrityError (500).
+        delegation = serializer.save()
         return Response(DelegationSerializer(delegation).data, status=status.HTTP_201_CREATED)
 
     def update(self, request, pk=None):
         delegation = get_object_or_404(Delegation, pk=pk)
         serializer = DelegationSerializer(delegation, data=request.data)
         serializer.is_valid(raise_exception=True)
-        updated_delegation = services.update_delegation(delegation, serializer.validated_data)
+        updated_delegation = serializer.save()
         return Response(DelegationSerializer(updated_delegation).data)
 
     def partial_update(self, request, pk=None):
         delegation = get_object_or_404(Delegation, pk=pk)
         serializer = DelegationSerializer(delegation, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
-        updated_delegation = services.update_delegation(delegation, serializer.validated_data)
+        updated_delegation = serializer.save()
         return Response(DelegationSerializer(updated_delegation).data)
 
     def destroy(self, request, pk=None):
