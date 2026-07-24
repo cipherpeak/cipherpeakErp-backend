@@ -79,7 +79,7 @@ class Employee(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True, blank=True, null=True)
     phone = models.CharField(max_length=50, blank=True, null=True)
     avatar_initials = models.CharField(max_length=10, blank=True, null=True)
-    avatar_color = models.CharField(max_length=20, blank=True, null=True)
+    avatar_color = models.CharField(max_length=255, blank=True, null=True)
     department = models.ForeignKey(
         'organization.Department',
         on_delete=models.SET_NULL,
@@ -218,7 +218,6 @@ class EmpDocument(models.Model):
     document_number = models.CharField(max_length=100, blank=True, null=True)
     issue_date = models.DateField(blank=True, null=True)
     expiry_date = models.DateField(blank=True, null=True)
-    file_name = models.CharField(max_length=255, blank=True, null=True)
     status = models.CharField(
         max_length=20,
         choices=DocumentStatus.choices,
@@ -231,6 +230,26 @@ class EmpDocument(models.Model):
         verbose_name = 'Employee Document'
         verbose_name_plural = 'Employee Documents'
         ordering = ['-created_at']
+
+
+class EmpDocumentFile(models.Model):
+    """
+    A single uploaded file attached to an EmpDocument. A document record can
+    carry more than one file (e.g. front/back of an ID, multiple pages).
+    """
+    document = models.ForeignKey(
+        EmpDocument,
+        on_delete=models.CASCADE,
+        related_name='files',
+    )
+    file = models.FileField(upload_to='hr/documents/%Y/%m/')
+    file_name = models.CharField(max_length=255, blank=True, null=True)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Employee Document File'
+        verbose_name_plural = 'Employee Document Files'
+        ordering = ['id']
 
     def __str__(self):
         return f"{self.employee.name} - {self.type}"

@@ -67,6 +67,7 @@ class EmployeeLoginView(APIView):
             'access': str(refresh.access_token),
             'refresh': str(refresh),
             'employee': {
+                'emp_id': employee.emp_id,
                 'name': employee.name,
                 'email': employee.email,
             }
@@ -232,36 +233,36 @@ class EmpDocumentViewSet(viewsets.ViewSet):
 
     def list(self, request):
         documents = services.get_all_documents()
-        serializer = EmpDocumentSerializer(documents, many=True)
+        serializer = EmpDocumentSerializer(documents, many=True, context={'request': request})
         return Response(serializer.data)
 
     def retrieve(self, request, pk=None):
         document = get_object_or_404(EmpDocument, pk=pk)
-        serializer = EmpDocumentSerializer(document)
+        serializer = EmpDocumentSerializer(document, context={'request': request})
         return Response(serializer.data)
 
     def create(self, request):
-        serializer = EmpDocumentSerializer(data=request.data)
+        serializer = EmpDocumentSerializer(data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
-        
+
         document = services.create_document(serializer.validated_data)
-        return Response(EmpDocumentSerializer(document).data, status=status.HTTP_201_CREATED)
+        return Response(EmpDocumentSerializer(document, context={'request': request}).data, status=status.HTTP_201_CREATED)
 
     def update(self, request, pk=None):
         document = get_object_or_404(EmpDocument, pk=pk)
-        serializer = EmpDocumentSerializer(document, data=request.data)
+        serializer = EmpDocumentSerializer(document, data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
-        
+
         updated_document = services.update_document(document, serializer.validated_data)
-        return Response(EmpDocumentSerializer(updated_document).data)
+        return Response(EmpDocumentSerializer(updated_document, context={'request': request}).data)
 
     def partial_update(self, request, pk=None):
         document = get_object_or_404(EmpDocument, pk=pk)
-        serializer = EmpDocumentSerializer(document, data=request.data, partial=True)
+        serializer = EmpDocumentSerializer(document, data=request.data, partial=True, context={'request': request})
         serializer.is_valid(raise_exception=True)
-        
+
         updated_document = services.update_document(document, serializer.validated_data)
-        return Response(EmpDocumentSerializer(updated_document).data)
+        return Response(EmpDocumentSerializer(updated_document, context={'request': request}).data)
 
     def destroy(self, request, pk=None):
         document = get_object_or_404(EmpDocument, pk=pk)

@@ -1,6 +1,6 @@
 from django.db import transaction
 from typing import Dict, Any, List
-from .models import Employee, AttendanceRecord, LeaveRequest, EmpDocument, EmpStatus, LeaveRequestStatus
+from .models import Employee, AttendanceRecord, LeaveRequest, EmpDocument, EmpDocumentFile, EmpStatus, LeaveRequestStatus
 
 
 # ===========================================================================
@@ -109,12 +109,25 @@ def get_all_documents() -> List[EmpDocument]:
     return EmpDocument.objects.all()
 
 def create_document(data: Dict[str, Any]) -> EmpDocument:
-    return EmpDocument.objects.create(**data)
+    uploaded_files = data.pop('uploaded_files', [])
+    with transaction.atomic():
+        document = EmpDocument.objects.create(**data)
+        for uploaded_file in uploaded_files:
+            EmpDocumentFile.objects.create(
+                document=document, file=uploaded_file, file_name=uploaded_file.name,
+            )
+    return document
 
 def update_document(document: EmpDocument, data: Dict[str, Any]) -> EmpDocument:
-    for field, value in data.items():
-        setattr(document, field, value)
-    document.save()
+    uploaded_files = data.pop('uploaded_files', [])
+    with transaction.atomic():
+        for field, value in data.items():
+            setattr(document, field, value)
+        document.save()
+        for uploaded_file in uploaded_files:
+            EmpDocumentFile.objects.create(
+                document=document, file=uploaded_file, file_name=uploaded_file.name,
+            )
     return document
 
 def delete_document(document: EmpDocument) -> None:
